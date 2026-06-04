@@ -1,0 +1,68 @@
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0152.hpc.itc.rwth-aachen.de:77416] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77416] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77414] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77414] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77421] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77421] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77406] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77406] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77408] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77408] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77418] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77418] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77419] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77419] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77413] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77413] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77411] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77411] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77412] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77412] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77403] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77403] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77404] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77404] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77402] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77402] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77409] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77409] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77417] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77417] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77407] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0152.hpc.itc.rwth-aachen.de:77407] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0665 seconds
+Canary time for 6250 samples: 0.0989 seconds
+Estimated time per rank: 9.8889 seconds
+RESULT:1.3942,21039.10

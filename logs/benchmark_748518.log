@@ -1,0 +1,327 @@
+Benchmark directory: /rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmarks/giant_100000  (model=giant, inputs=100000)
+Using SmartSim runtime root: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python
+Using SmartSim runtime tar dir: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python
+Keeping existing '/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/libtorch' directory (not replacing with symlink).
+libtorch found in /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/libtorch
+Overriding devices via argument: cuda-12
+
+=== Installing SmartSim for device: cuda-12 ===
+Including backend: torch
+Including backend: onnxruntime
+Including backend: tensorflow
+SmartSim build command: smart build --device cuda-12
+Install location: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12
+Base directory for SmartSim installation: /hpcwork/ro092286/smartsim/CPP-ML-Interface/
+Python virtual environment already exists at /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12
+Activating Python virtual environment for device: cuda-12
+smartsim is already installed in the virtual environment.
+Checking SmartSim build status...
+command succeeded
+SmartSim' redis is already built and available.
+SmartSim' has TensorFlow support.
+SmartSim is already fully built with all backends.
+Requirement already satisfied: clang==15.0.7 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 1)) (15.0.7)
+Requirement already satisfied: numpy in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 3)) (1.26.4)
+Requirement already satisfied: mpi4py in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 4)) (4.1.2)
+Requirement already satisfied: cython in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 5)) (3.2.4)
+Requirement already satisfied: pandas in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 8)) (2.3.3)
+Requirement already satisfied: matplotlib in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 9)) (3.9.4)
+Requirement already satisfied: pynvml in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 12)) (13.0.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2026.2)
+Requirement already satisfied: tzdata>=2022.7 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2026.2)
+Requirement already satisfied: fonttools>=4.22.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (4.60.2)
+Requirement already satisfied: pillow>=8 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (11.3.0)
+Requirement already satisfied: kiwisolver>=1.3.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (1.4.7)
+Requirement already satisfied: importlib-resources>=3.2.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (6.5.2)
+Requirement already satisfied: contourpy>=1.0.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (1.3.0)
+Requirement already satisfied: pyparsing>=2.3.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (3.3.2)
+Requirement already satisfied: cycler>=0.10 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (0.12.1)
+Requirement already satisfied: packaging>=20.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (26.2)
+Requirement already satisfied: nvidia-ml-py>=12.0.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pynvml->-r requirements.txt (line 12)) (13.595.45)
+Requirement already satisfied: zipp>=3.1.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from importlib-resources>=3.2.0->matplotlib->-r requirements.txt (line 9)) (3.23.1)
+Requirement already satisfied: six>=1.5 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from python-dateutil>=2.8.2->pandas->-r requirements.txt (line 8)) (1.17.0)
+WARNING: You are using pip version 21.3.1; however, version 26.0.1 is available.
+You should consider upgrading via the '/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/bin/python -m pip install --upgrade pip' command.
+Runtime libstdc++ already up-to-date in /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/runtime_libs
+
+--- Creating SmartSim runtime tar bundles ---
+Runtime tar is up-to-date; skipping: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12.tar
+Installation of the smartsim 'backend' complete. This includes the SmartRedis Python client. The Fortran/C/C++ clients can be built from source as needed.
+
+--- Installing SmartRedis C/C++ client ---
+SmartRedis directory already exists (/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/SmartRedis). Skipping clone.
+Already on the correct branch: develop
+Current directory: /hpcwork/ro092286/smartsim/CPP-ML-Interface
+Starting benchmark. Currently started: 28 / 125
+Scheduling next job in the chain...
+sbatch: [I] Partition 'devel' requested, max time 60 mins, oversubscribe 2 is set.
+Submitted batch job 750369
+--------------------------------------------------------
+Running ID 28: Ranks=2, Intra=1, Inter=8
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:494165] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:494166] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:494165] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:494166] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1911 seconds
+Canary time for 500 samples: 2.4271 seconds
+Estimated time per rank: 242.7051 seconds
+RESULT:214.1815,8941.90
+--------------------------------------------------------
+Running ID 29: Ranks=2, Intra=1, Inter=16
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:495888] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:495889] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:495888] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:495889] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1384 seconds
+Canary time for 500 samples: 2.3024 seconds
+Estimated time per rank: 230.2379 seconds
+RESULT:211.9103,8951.85
+--------------------------------------------------------
+Running ID 30: Ranks=2, Intra=2, Inter=1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:497548] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:497549] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:497549] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:497548] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0924 seconds
+Canary time for 500 samples: 1.2950 seconds
+Estimated time per rank: 129.5030 seconds
+RESULT:107.2512,8978.40
+--------------------------------------------------------
+Running ID 31: Ranks=2, Intra=2, Inter=2
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:499148] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:499149] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:499148] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:499149] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1012 seconds
+Canary time for 500 samples: 1.2847 seconds
+Estimated time per rank: 128.4672 seconds
+RESULT:109.2186,9010.09
+--------------------------------------------------------
+Running ID 32: Ranks=2, Intra=2, Inter=4
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:500197] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:500198] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:500197] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:500198] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0998 seconds
+Canary time for 500 samples: 1.2899 seconds
+Estimated time per rank: 128.9880 seconds
+RESULT:108.2941,8961.75
+--------------------------------------------------------
+Running ID 33: Ranks=2, Intra=2, Inter=8
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:501220] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:501220] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:501221] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:501221] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0923 seconds
+Canary time for 500 samples: 1.2204 seconds
+Estimated time per rank: 122.0408 seconds
+RESULT:108.0104,9018.11
+--------------------------------------------------------
+Running ID 34: Ranks=2, Intra=2, Inter=16
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:502718] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:502719] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:502718] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:502719] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0923 seconds
+Canary time for 500 samples: 1.2193 seconds
+Estimated time per rank: 121.9323 seconds
+RESULT:107.1258,8954.64
+--------------------------------------------------------
+Running ID 35: Ranks=2, Intra=4, Inter=1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:503738] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:503739] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:503738] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:503739] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0702 seconds
+Canary time for 500 samples: 0.7045 seconds
+Estimated time per rank: 70.4474 seconds
+RESULT:58.4408,8980.06
+--------------------------------------------------------
+Running ID 36: Ranks=2, Intra=4, Inter=2
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:504544] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:504545] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:504544] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:504545] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0775 seconds
+Canary time for 500 samples: 0.7079 seconds
+Estimated time per rank: 70.7871 seconds
+RESULT:58.2694,8984.14
+--------------------------------------------------------
+Running ID 37: Ranks=2, Intra=4, Inter=4
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:505348] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:505348] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:505347] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:505347] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0704 seconds
+Canary time for 500 samples: 0.6700 seconds
+Estimated time per rank: 67.0030 seconds
+RESULT:57.9493,8937.22
+--------------------------------------------------------
+Running ID 38: Ranks=2, Intra=4, Inter=8
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:506099] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:506100] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:506099] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:506100] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0693 seconds
+Canary time for 500 samples: 0.6657 seconds
+Estimated time per rank: 66.5650 seconds
+RESULT:58.1730,8968.33
+--------------------------------------------------------
+Running ID 39: Ranks=2, Intra=4, Inter=16
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:506844] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:506845] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:506844] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:506845] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0700 seconds
+Canary time for 500 samples: 0.6855 seconds
+Estimated time per rank: 68.5514 seconds
+RESULT:58.2483,8968.05
+--------------------------------------------------------
+Running ID 40: Ranks=2, Intra=8, Inter=1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:507601] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:507601] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:507602] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:507602] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0653 seconds
+Canary time for 500 samples: 0.4658 seconds
+Estimated time per rank: 46.5847 seconds
+RESULT:34.0905,9108.98
+--------------------------------------------------------
+Running ID 41: Ranks=2, Intra=8, Inter=2
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:508335] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:508335] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:508336] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:508336] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0671 seconds
+Canary time for 500 samples: 0.4966 seconds
+Estimated time per rank: 49.6574 seconds
+RESULT:34.2947,9125.64
+--------------------------------------------------------
+Running ID 42: Ranks=2, Intra=8, Inter=4
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:508876] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:508876] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:508877] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:508877] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0686 seconds
+Canary time for 500 samples: 0.4967 seconds
+Estimated time per rank: 49.6654 seconds
+RESULT:34.4364,9092.16
+--------------------------------------------------------
+Running ID 43: Ranks=2, Intra=8, Inter=8
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:509655] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:509655] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:509656] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:509656] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0644 seconds
+Canary time for 500 samples: 0.5189 seconds
+Estimated time per rank: 51.8936 seconds
+RESULT:34.1887,9090.45
+--------------------------------------------------------
+Running ID 44: Ranks=2, Intra=8, Inter=16
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:510336] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:510337] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:510336] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:510337] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0690 seconds
+Canary time for 500 samples: 0.4816 seconds
+Estimated time per rank: 48.1623 seconds
+RESULT:34.1919,9108.37
+--------------------------------------------------------
+Running ID 45: Ranks=2, Intra=16, Inter=1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:510940] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:510939] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:510940] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:510939] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0673 seconds
+Canary time for 500 samples: 0.7757 seconds
+Estimated time per rank: 77.5723 seconds
+RESULT:458.8590,9254.29
+--------------------------------------------------------
+Running ID 46: Ranks=2, Intra=16, Inter=2
+srun: Step created for StepId=748518.18
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:514020] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:514020] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:514021] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:514021] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.0705 seconds
+Canary time for 500 samples: 0.8516 seconds
+Estimated time per rank: 85.1649 seconds
+RESULT:651.2601,9249.37
+Time limit reached (2641 seconds). Exiting gracefully to let next chained job take over.

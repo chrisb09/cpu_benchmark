@@ -1,0 +1,36 @@
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:223918] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223918] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223920] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223920] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223916] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223916] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223917] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223917] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223915] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223915] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223921] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223921] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223919] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223919] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223922] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:223922] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.4649 seconds
+Canary time for 12 samples: 4.2941 seconds
+Estimated total time per rank: 447.3044 seconds
+RESULT:20.5792,17652.26

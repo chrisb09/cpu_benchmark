@@ -1,0 +1,18 @@
+🏁 **Benchmark Complete!**
+**Config:** `transformer` [mmcp] | 10000 inputs
+• Total Tasks: 125
+• Total Time: 4h 37m 46s
+• Started: 2026-06-02 13:26:29
+• Finished: 2026-06-02 18:04:15
+
+**Summary:**
+### Summary of Transformer CPU Benchmarks
+
+*   **Top Performer**: 16 Ranks, 1 Intra-op Thread (12.07s). This configuration is 3x faster than using 1 Rank with 16 threads.
+*   **Rank Parallelism is King**: For this Transformer model, increasing MPI ranks (processing inputs in parallel) is vastly more effective than increasing intra-op threads.
+*   **Critical Warning**: Avoid oversubscribing with `intra=4` or `intra=8`. These settings triggered a performance cliff, making the benchmark up to 42x slower than the optimal setup.
+*   **Memory Footprint**: Total memory usage (RSS) peaks at ~27 GB when using 16 ranks. Ensure nodes have at least 32 GB of RAM for this configuration.
+*   **Inter-op Insight**: Adjusting inter-op parallelism provided no measurable benefit; keep `inter=1` or `16` as it does not hinder performance.
+\n🔗 [Detailed Analysis](https://christian-f-brinkmann.de/uploads/bench_transformer_20260602_180442.md)
+
+`Full Report: /rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmarks/transformer_mmcp_10000/analysis.md`

@@ -1,0 +1,149 @@
+Benchmark directory: /rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmarks/giant_100000  (model=giant, inputs=100000)
+Cleaning previous benchmark state/results...
+Module OpenSSL/1.1 is not loaded. Purging and loading required modules.
+Purging and loading required modules for SmartSim...
+Loading required modules...
+[INFO] Module OpenSSL/1.1 loaded.
+[WARN] This node does not have a GPU installed. CUDA will not work.
+[WARN] Please refer to https://help.itc.rwth-aachen.de for information on which
+nodes feature GPUs. 
+[INFO] Module CUDA/12.4.0 loaded.
+[INFO] Module GCCcore/11.3.0 loaded.
+[INFO] Module Clang/15.0.5 loaded.
+[INFO] Module GCC/11.3.0 loaded.
+[INFO] Module OpenMPI/4.1.4 loaded.
+[INFO] Module FFTW.MPI/3.3.10 loaded.
+[INFO] Module HDF5/1.12.2 loaded.
+[INFO] Module PnetCDF/1.12.3 loaded.
+[INFO] Module cuDNN/8.9.7.29-CUDA-12.4.0 loaded.
+[INFO] Module imkl/2024.2.0 loaded.
+Using SmartSim runtime root: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python
+Using SmartSim runtime tar dir: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python
+Keeping existing '/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/libtorch' directory (not replacing with symlink).
+libtorch found in /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/libtorch
+Overriding devices via argument: cuda-12
+
+=== Installing SmartSim for device: cuda-12 ===
+Including backend: torch
+Including backend: onnxruntime
+Including backend: tensorflow
+SmartSim build command: smart build --device cuda-12
+Install location: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12
+Base directory for SmartSim installation: /hpcwork/ro092286/smartsim/CPP-ML-Interface/
+Python virtual environment already exists at /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12
+Activating Python virtual environment for device: cuda-12
+smartsim is already installed in the virtual environment.
+Checking SmartSim build status...
+command succeeded
+SmartSim' redis is already built and available.
+SmartSim' has TensorFlow support.
+SmartSim is already fully built with all backends.
+Requirement already satisfied: clang==15.0.7 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 1)) (15.0.7)
+Requirement already satisfied: numpy in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 3)) (1.26.4)
+Requirement already satisfied: mpi4py in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 4)) (4.1.2)
+Requirement already satisfied: cython in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 5)) (3.2.4)
+Requirement already satisfied: pandas in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 8)) (2.3.3)
+Requirement already satisfied: matplotlib in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 9)) (3.9.4)
+Requirement already satisfied: pynvml in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 12)) (13.0.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2026.2)
+Requirement already satisfied: tzdata>=2022.7 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2026.2)
+Requirement already satisfied: fonttools>=4.22.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (4.60.2)
+Requirement already satisfied: cycler>=0.10 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (0.12.1)
+Requirement already satisfied: packaging>=20.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (26.2)
+Requirement already satisfied: pillow>=8 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (11.3.0)
+Requirement already satisfied: importlib-resources>=3.2.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (6.5.2)
+Requirement already satisfied: pyparsing>=2.3.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (3.3.2)
+Requirement already satisfied: kiwisolver>=1.3.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (1.4.7)
+Requirement already satisfied: contourpy>=1.0.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (1.3.0)
+Requirement already satisfied: nvidia-ml-py>=12.0.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pynvml->-r requirements.txt (line 12)) (13.595.45)
+Requirement already satisfied: zipp>=3.1.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from importlib-resources>=3.2.0->matplotlib->-r requirements.txt (line 9)) (3.23.1)
+Requirement already satisfied: six>=1.5 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from python-dateutil>=2.8.2->pandas->-r requirements.txt (line 8)) (1.17.0)
+WARNING: You are using pip version 21.3.1; however, version 26.0.1 is available.
+You should consider upgrading via the '/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/bin/python -m pip install --upgrade pip' command.
+Runtime libstdc++ already up-to-date in /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/runtime_libs
+
+--- Creating SmartSim runtime tar bundles ---
+Runtime tar is up-to-date; skipping: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12.tar
+Installation of the smartsim 'backend' complete. This includes the SmartRedis Python client. The Fortran/C/C++ clients can be built from source as needed.
+
+--- Installing SmartRedis C/C++ client ---
+SmartRedis directory already exists (/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/SmartRedis). Skipping clone.
+Already on the correct branch: develop
+Current directory: /hpcwork/ro092286/smartsim/CPP-ML-Interface
+Starting benchmark. Currently started: 0 / 125
+Scheduling next job in the chain...
+sbatch: [I] Partition 'devel' requested, max time 60 mins, oversubscribe 2 is set.
+Submitted batch job 747167
+--------------------------------------------------------
+Running ID 0: Ranks=1, Intra=1, Inter=1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:158711] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:158711] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.3222 seconds
+Canary time for 1000 samples: 4.3691 seconds
+Estimated time per rank: 436.9132 seconds
+RESULT:423.0840,6830.00
+--------------------------------------------------------
+Running ID 1: Ranks=1, Intra=1, Inter=2
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:161545] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:161545] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1420 seconds
+Canary time for 1000 samples: 4.3272 seconds
+Estimated time per rank: 432.7184 seconds
+RESULT:422.9144,6815.23
+--------------------------------------------------------
+Running ID 2: Ranks=1, Intra=1, Inter=4
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:164891] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:164891] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1408 seconds
+Canary time for 1000 samples: 4.3271 seconds
+Estimated time per rank: 432.7149 seconds
+RESULT:423.0863,6891.06
+--------------------------------------------------------
+Running ID 3: Ranks=1, Intra=1, Inter=8
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:167985] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:167985] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1401 seconds
+Canary time for 1000 samples: 4.2999 seconds
+Estimated time per rank: 429.9864 seconds
+RESULT:422.9825,6863.04
+--------------------------------------------------------
+Running ID 4: Ranks=1, Intra=1, Inter=16
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:170727] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:170727] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1401 seconds
+Canary time for 1000 samples: 4.3236 seconds
+Estimated time per rank: 432.3550 seconds
+RESULT:422.5996,6814.91
+--------------------------------------------------------
+Running ID 5: Ranks=1, Intra=2, Inter=1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:173478] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:173478] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1134 seconds
+Canary time for 1000 samples: 2.9815 seconds
+Estimated time per rank: 298.1456 seconds
+RESULT:212.1289,6799.45
+--------------------------------------------------------
+Running ID 6: Ranks=1, Intra=2, Inter=2
+srun: Step created for StepId=747161.6
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[r23m0124.hpc.itc.rwth-aachen.de:175045] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[r23m0124.hpc.itc.rwth-aachen.de:175045] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 0.1131 seconds
+Canary time for 1000 samples: 2.2104 seconds
+Estimated time per rank: 221.0391 seconds
+RESULT:211.8628,6816.50
+Time limit reached (2598 seconds). Exiting gracefully to let next chained job take over.

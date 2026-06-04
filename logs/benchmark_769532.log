@@ -1,0 +1,1785 @@
+Benchmark directory: /rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmarks/transformer_mmcp_10000  (model=transformer, schema=mmcp, inputs=10000)
+Cleaning previous benchmark state/results...
+Using SmartSim runtime root: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python
+Using SmartSim runtime tar dir: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python
+Keeping existing '/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/libtorch' directory (not replacing with symlink).
+libtorch found in /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/libtorch
+Overriding devices via argument: cuda-12
+
+=== Installing SmartSim for device: cuda-12 ===
+Including backend: torch
+Including backend: onnxruntime
+Including backend: tensorflow
+SmartSim build command: smart build --device cuda-12
+Install location: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12
+Base directory for SmartSim installation: /hpcwork/ro092286/smartsim/CPP-ML-Interface/
+Python virtual environment already exists at /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12
+Activating Python virtual environment for device: cuda-12
+smartsim is already installed in the virtual environment.
+Checking SmartSim build status...
+command succeeded
+SmartSim' redis is already built and available.
+SmartSim' has TensorFlow support.
+SmartSim is already fully built with all backends.
+Requirement already satisfied: clang==15.0.7 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 1)) (15.0.7)
+Requirement already satisfied: numpy in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 3)) (1.26.4)
+Requirement already satisfied: mpi4py in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 4)) (4.1.2)
+Requirement already satisfied: cython in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 5)) (3.2.4)
+Requirement already satisfied: pandas in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 8)) (2.3.3)
+Requirement already satisfied: matplotlib in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 9)) (3.9.4)
+Requirement already satisfied: pynvml in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from -r requirements.txt (line 12)) (13.0.1)
+Requirement already satisfied: tzdata>=2022.7 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2026.2)
+Requirement already satisfied: python-dateutil>=2.8.2 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pandas->-r requirements.txt (line 8)) (2026.2)
+Requirement already satisfied: importlib-resources>=3.2.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (6.5.2)
+Requirement already satisfied: pillow>=8 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (11.3.0)
+Requirement already satisfied: cycler>=0.10 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (0.12.1)
+Requirement already satisfied: packaging>=20.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (26.2)
+Requirement already satisfied: pyparsing>=2.3.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (3.3.2)
+Requirement already satisfied: contourpy>=1.0.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (1.3.0)
+Requirement already satisfied: kiwisolver>=1.3.1 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (1.4.7)
+Requirement already satisfied: fonttools>=4.22.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from matplotlib->-r requirements.txt (line 9)) (4.60.2)
+Requirement already satisfied: nvidia-ml-py>=12.0.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from pynvml->-r requirements.txt (line 12)) (13.595.45)
+Requirement already satisfied: zipp>=3.1.0 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from importlib-resources>=3.2.0->matplotlib->-r requirements.txt (line 9)) (3.23.1)
+Requirement already satisfied: six>=1.5 in /rwthfs/rz/cluster/home/thes2181/python/smartsim_cuda-12/lib/python3.9/site-packages (from python-dateutil>=2.8.2->pandas->-r requirements.txt (line 8)) (1.17.0)
+WARNING: You are using pip version 21.3.1; however, version 26.0.1 is available.
+You should consider upgrading via the '/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/bin/python -m pip install --upgrade pip' command.
+Runtime libstdc++ already up-to-date in /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/runtime_libs
+
+--- Creating SmartSim runtime tar bundles ---
+Runtime tar is up-to-date; skipping: /hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12.tar
+Installation of the smartsim 'backend' complete. This includes the SmartRedis Python client. The Fortran/C/C++ clients can be built from source as needed.
+
+--- Installing SmartRedis C/C++ client ---
+SmartRedis directory already exists (/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/SmartRedis). Skipping clone.
+Already on the correct branch: develop
+Current directory: /hpcwork/ro092286/smartsim/CPP-ML-Interface
+Scheduling next job in the chain...
+sbatch: [I] Partition 'devel' requested, max time 60 mins, oversubscribe 2 is set.
+Submitted batch job 769533
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:84389] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:84389] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.1140 seconds
+Canary time for 100 samples: 3.9285 seconds
+Estimated time per rank: 392.8524 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:84760] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:84760] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.1600 seconds
+Canary time for 100 samples: 3.8873 seconds
+Estimated time per rank: 388.7286 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:85107] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:85107] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.2323 seconds
+Canary time for 100 samples: 3.6758 seconds
+Estimated time per rank: 367.5818 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:85468] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:85468] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9225 seconds
+Canary time for 100 samples: 3.9199 seconds
+Estimated time per rank: 391.9928 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:85836] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:85836] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9980 seconds
+Canary time for 100 samples: 4.1701 seconds
+Estimated time per rank: 417.0132 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:86323] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:86323] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.0004 seconds
+Canary time for 100 samples: 3.6396 seconds
+Estimated time per rank: 363.9601 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:86658] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:86658] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.7573 seconds
+Canary time for 100 samples: 3.8866 seconds
+Estimated time per rank: 388.6648 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:87040] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:87040] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.0601 seconds
+Canary time for 100 samples: 3.1833 seconds
+Estimated time per rank: 318.3255 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:87403] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:87403] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.8114 seconds
+Canary time for 100 samples: 4.1002 seconds
+Estimated time per rank: 410.0231 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:87752] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:87752] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.0078 seconds
+Canary time for 100 samples: 3.4555 seconds
+Estimated time per rank: 345.5533 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:88124] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:88124] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9180 seconds
+Canary time for 100 samples: 3.2458 seconds
+Estimated time per rank: 324.5802 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:88647] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:88647] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.0455 seconds
+Canary time for 100 samples: 3.3667 seconds
+Estimated time per rank: 336.6664 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:88978] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:88978] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.8086 seconds
+Canary time for 100 samples: 3.0533 seconds
+Estimated time per rank: 305.3331 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:89349] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:89349] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.7473 seconds
+Canary time for 100 samples: 3.3567 seconds
+Estimated time per rank: 335.6657 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:89725] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:89725] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.0708 seconds
+Canary time for 100 samples: 3.2861 seconds
+Estimated time per rank: 328.6136 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:90094] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:90094] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.7165 seconds
+Canary time for 100 samples: 2.8450 seconds
+Estimated time per rank: 284.5040 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:90477] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:90477] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.5161 seconds
+Canary time for 100 samples: 3.2113 seconds
+Estimated time per rank: 321.1287 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:90883] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:90883] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.7841 seconds
+Canary time for 100 samples: 3.0345 seconds
+Estimated time per rank: 303.4523 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:91340] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:91340] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.8680 seconds
+Canary time for 100 samples: 3.1516 seconds
+Estimated time per rank: 315.1557 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:91725] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:91725] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9185 seconds
+Canary time for 100 samples: 2.8753 seconds
+Estimated time per rank: 287.5311 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:92108] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:92108] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.7012 seconds
+Canary time for 100 samples: 2.9158 seconds
+Estimated time per rank: 291.5805 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+srun: Step created for StepId=769532.21
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:92518] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:92518] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.8905 seconds
+Canary time for 100 samples: 3.2919 seconds
+Estimated time per rank: 329.1897 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:92891] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:92891] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.8039 seconds
+Canary time for 100 samples: 3.1369 seconds
+Estimated time per rank: 313.6875 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:93310] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:93310] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9412 seconds
+Canary time for 100 samples: 3.1644 seconds
+Estimated time per rank: 316.4363 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:93870] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:93870] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9168 seconds
+Canary time for 100 samples: 2.9558 seconds
+Estimated time per rank: 295.5787 seconds
+Traceback (most recent call last):
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 142, in <module>
+    main()
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 120, in main
+    _ = benchmark_call(batch_input)
+  File "/rwthfs/rz/cluster/hpcwork/ro092286/smartsim/cpu_benchmark/benchmark.py", line 65, in <lambda>
+    benchmark_call = lambda x: model(x)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__.py", line 31, in forward
+      src_mask = _0(device, dim_a, dim_b, )
+      model = self.model
+      prediction = (model).forward(src, tgt0, src_mask, tgt_mask, )
+                    ~~~~~~~~~~~~~~ <--- HERE
+      batch_first1 = self.batch_first
+      if batch_first1:
+  File "code/__torch__.py", line 83, in forward
+    src0 = (enc_inp).forward(src, )
+    positional_enc_layer = self.positional_enc_layer
+    src1 = (positional_enc_layer).forward(src0, )
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    encoder = self.encoder
+    src2 = (encoder).forward(src1, None, None, None, )
+  File "code/__torch__.py", line 112, in forward
+      pe2 = torch.slice(pe1, 0, None, torch.size(x, 0))
+      pe = pe2
+    x0 = torch.add(x, pe)
+         ~~~~~~~~~ <--- HERE
+    dropout = self.dropout
+    return (dropout).forward(x0, )
+
+Traceback of TorchScript, original code (most recent call last):
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 247, in forward
+    
+            # Generate prediction from the model
+            prediction = self.model(src, tgt, src_mask, tgt_mask)
+                         ~~~~~~~~~~ <--- HERE
+    
+            # Extract the last predicted time step and unsqueeze to maintain sequence dimension.
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 165, in forward
+        """
+        src = self.enc_inp(src)
+        src = self.positional_enc_layer(src)
+              ~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+        src = self.encoder(src)
+        decoder_output = self.dec_inp(tgt)
+  File "/rwthfs/rz/cluster/home/thes1961/cpp-ml-interface/src/ml_coupling/maia/aix/transformer_inference_to_script.py", line 69, in forward
+            pe = self.pe[:x.size(0)]
+            
+        x = x + pe
+            ~~~~~~ <--- HERE
+        
+        #x = x + self.pe[:x.size(self.x_dim)]#before adding the above for batchfirst
+RuntimeError: The size of tensor a (10000) must match the size of tensor b (5000) at non-singleton dimension 1
+
+srun: error: n23m0123: task 0: Exited with exit code 1
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:94239] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:94239] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:94238] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:94238] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.3035 seconds
+Canary time for 50 samples: 3.4418 seconds
+Estimated time per rank: 344.1792 seconds
+RESULT:149.7332,19359.40
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:95547] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:95548] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:95547] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:95548] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.0184 seconds
+Canary time for 50 samples: 3.7690 seconds
+Estimated time per rank: 376.8961 seconds
+RESULT:149.5171,19360.93
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:96951] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:96952] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:96951] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:96952] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 3.3222 seconds
+Canary time for 50 samples: 3.4510 seconds
+Estimated time per rank: 345.0972 seconds
+RESULT:142.7548,19365.79
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[n23m0123.hpc.itc.rwth-aachen.de:98343] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:98344] mca_base_component_repository_open: unable to open mca_pmix_s1: libpmi.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:98343] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+[n23m0123.hpc.itc.rwth-aachen.de:98344] mca_base_component_repository_open: unable to open mca_pmix_s2: libpmi2.so.0: cannot open shared object file: No such file or directory (ignored)
+Warmup time: 2.9524 seconds
+Canary time for 50 samples: 3.4204 seconds
+Estimated time per rank: 342.0437 seconds
+srun: Job step aborted: Waiting up to 92 seconds for job step to finish.
+[2026-06-02T13:16:26.961] error: *** JOB 769532 ON n23m0123 CANCELLED AT 2026-06-02T13:16:26 DUE to SIGNAL Terminated ***
+[2026-06-02T13:16:26.962] error: *** STEP 769532.28 ON n23m0123 CANCELLED AT 2026-06-02T13:16:26 DUE to SIGNAL Terminated ***

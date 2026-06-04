@@ -1,0 +1,148 @@
+Starting GPU Benchmarks...
+==========================================================
+BENCHMARKING: giant
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/giant_cpu.pt
+Inputs: 100000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/giant_cpu.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/giant_cpu.pt (100000 inputs):
+  Transfer CPU -> GPU: 0.0012s
+  Actual Inference:    1.9648s
+  Transfer GPU -> CPU: 0.0005s
+  ------------------------------
+  Total Time:          1.9664s
+RESULT_GPU:../mini_app/train_models/model_a/giant_cpu.pt,100000,0.0012,1.9648,0.0005,1.9664
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/giant_cuda.pt
+Inputs: 100000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/giant_cuda.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/giant_cuda.pt (100000 inputs):
+  Transfer CPU -> GPU: 0.0012s
+  Actual Inference:    1.9712s
+  Transfer GPU -> CPU: 0.0004s
+  ------------------------------
+  Total Time:          1.9728s
+RESULT_GPU:../mini_app/train_models/model_a/giant_cuda.pt,100000,0.0012,1.9712,0.0004,1.9728
+==========================================================
+BENCHMARKING: transformer
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/transformer_cpu.pt
+Inputs: 1000000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/transformer_cpu.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/transformer_cpu.pt (1000000 inputs):
+  Transfer CPU -> GPU: 0.0085s
+  Actual Inference:    0.5364s
+  Transfer GPU -> CPU: 0.0030s
+  ------------------------------
+  Total Time:          0.5480s
+RESULT_GPU:../mini_app/train_models/model_a/transformer_cpu.pt,1000000,0.0085,0.5364,0.0030,0.5480
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/transformer_cuda.pt
+Inputs: 1000000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/transformer_cuda.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/transformer_cuda.pt (1000000 inputs):
+  Transfer CPU -> GPU: 0.0074s
+  Actual Inference:    0.4791s
+  Transfer GPU -> CPU: 0.0016s
+  ------------------------------
+  Total Time:          0.4882s
+RESULT_GPU:../mini_app/train_models/model_a/transformer_cuda.pt,1000000,0.0074,0.4791,0.0016,0.4882
+==========================================================
+BENCHMARKING: mmcp_transformer
+----------------------------------------------------------
+Model: ../MMCP_TOM/input/transformer_inference_scripted_fw2.pt
+Inputs: 10000 | Schema: mmcp
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../MMCP_TOM/input/transformer_inference_scripted_fw2.pt
+
+Benchmark Results for ../MMCP_TOM/input/transformer_inference_scripted_fw2.pt (10000 inputs):
+  Transfer CPU -> GPU: 0.0129s
+  Actual Inference:    3.9741s
+  Transfer GPU -> CPU: 0.0001s
+  ------------------------------
+  Total Time:          3.9871s
+RESULT_GPU:../MMCP_TOM/input/transformer_inference_scripted_fw2.pt,10000,0.0129,3.9741,0.0001,3.9871
+==========================================================
+BENCHMARKING: perfect
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/perfect_cpu.pt
+Inputs: 100000000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/perfect_cpu.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/perfect_cpu.pt (100000000 inputs):
+  Transfer CPU -> GPU: 0.7286s
+  Actual Inference:    0.2836s
+  Transfer GPU -> CPU: 0.1899s
+  ------------------------------
+  Total Time:          1.2021s
+RESULT_GPU:../mini_app/train_models/model_a/perfect_cpu.pt,100000000,0.7286,0.2836,0.1899,1.2021
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/perfect_cuda.pt
+Inputs: 100000000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/perfect_cuda.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/perfect_cuda.pt (100000000 inputs):
+  Transfer CPU -> GPU: 0.6964s
+  Actual Inference:    0.3101s
+  Transfer GPU -> CPU: 0.1970s
+  ------------------------------
+  Total Time:          1.2035s
+RESULT_GPU:../mini_app/train_models/model_a/perfect_cuda.pt,100000000,0.6964,0.3101,0.1970,1.2035
+==========================================================
+BENCHMARKING: watercnn
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/watercnn_cpu.pt
+Inputs: 10000000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/watercnn_cpu.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/watercnn_cpu.pt (10000000 inputs):
+  Transfer CPU -> GPU: 0.1319s
+  Actual Inference:    0.0811s
+  Transfer GPU -> CPU: 0.0380s
+  ------------------------------
+  Total Time:          0.2509s
+RESULT_GPU:../mini_app/train_models/model_a/watercnn_cpu.pt,10000000,0.1319,0.0811,0.0380,0.2509
+----------------------------------------------------------
+Model: ../mini_app/train_models/model_a/watercnn_cuda.pt
+Inputs: 10000000 | Schema: mini_app
+/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/lib64/python3.9/site-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Using device: NVIDIA H100
+Loading model from: ../mini_app/train_models/model_a/watercnn_cuda.pt
+
+Benchmark Results for ../mini_app/train_models/model_a/watercnn_cuda.pt (10000000 inputs):
+  Transfer CPU -> GPU: 0.1188s
+  Actual Inference:    0.0813s
+  Transfer GPU -> CPU: 0.0290s
+  ------------------------------
+  Total Time:          0.2291s
+RESULT_GPU:../mini_app/train_models/model_a/watercnn_cuda.pt,10000000,0.1188,0.0813,0.0290,0.2291
+==========================================================
+GPU Benchmarks completed.
