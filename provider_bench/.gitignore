@@ -1,6 +1,12 @@
 build/
 logs/
-.ssdb_endpoint
-.solver_done
-provider_results.csv
-job_plot.png
+.ssdb_endpoint*
+.solver_done*
+*.csv
+*.png
+smartsim_experiments/
+*.log
+*started.txt
+*combinations.txt
+*.pt
+__pycache__/

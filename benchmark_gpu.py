@@ -17,6 +17,7 @@ def main():
     parser.add_argument("--feature-dim", type=int, default=512, help="Feature dimension for mmcp schema")
     parser.add_argument("--max-batch-size", type=int, default=0, 
                         help="Maximum batch size per inference call. 0 = auto-detect based on schema.")
+    parser.add_argument("--runs", type=int, default=10, help="Number of benchmark runs")
     args = parser.parse_args()
 
     # Check for GPU
@@ -41,7 +42,6 @@ def main():
     # Load model
     model_path = args.model
     if not os.path.exists(model_path):
-        # Try some default locations
         paths_to_try = [
             f"../mini_app/train_models/model_a/{args.model}",
             f"../mini_app/train_models/model_a/{args.model}_cpu.pt",
@@ -60,7 +60,6 @@ def main():
 
     print(f"Loading model from: {model_path}")
     try:
-        # Load to CPU first
         model = torch.jit.load(model_path, map_location="cpu")
         model.to(device)
         model.eval()
@@ -68,71 +67,93 @@ def main():
         print(f"FAILED to load model: {e}")
         return
 
-    # Create dummy inputs on CPU
     num_inputs = args.num_inputs
     if args.schema == "mini_app":
         warmup_input_cpu = torch.randn(1, 18, dtype=torch.float32)
         batch_input_cpu = torch.randn(num_inputs, 18, dtype=torch.float32)
     elif args.schema == "mmcp":
-        warmup_input_cpu = torch.randn(args.seq_len, 1, args.feature_dim, dtype=torch.float32)
-        batch_input_cpu = torch.randn(args.seq_len, num_inputs, args.feature_dim, dtype=torch.float32)
+        warmup_input_cpu = torch.randn(3 * 1, args.seq_len, args.feature_dim, dtype=torch.float32)
+        batch_input_cpu = torch.randn(3 * num_inputs, args.seq_len, args.feature_dim, dtype=torch.float32)
 
     # --- Warmup ---
-    # Transfer warmup input
     warmup_input_gpu = warmup_input_cpu.to(device)
-    # Warmup inference
     with torch.no_grad():
         _ = model(warmup_input_gpu)
     torch.cuda.synchronize()
 
     # --- Benchmark ---
+    import numpy as np
     
-    # 1. Measure data transfer time: CPU -> GPU
-    transfer_in_start = time.perf_counter()
-    batch_input_gpu = batch_input_cpu.to(device)
-    torch.cuda.synchronize()
-    transfer_in_end = time.perf_counter()
-    transfer_in_time = transfer_in_end - transfer_in_start
+    total_times = []
 
-    # 2. Measure actual inference time
-    inference_start = time.perf_counter()
-    outputs_gpu = []
-    with torch.no_grad():
-        cursor = 0
-        while cursor < num_inputs:
-            end_idx = min(cursor + max_bs, num_inputs)
-            if args.schema == "mmcp":
-                batch = batch_input_gpu[:, cursor:end_idx, :]
-            else:
-                batch = batch_input_gpu[cursor:end_idx]
-            
-            out = model(batch)
-            outputs_gpu.append(out)
-            cursor = end_idx
-    torch.cuda.synchronize()
-    inference_end = time.perf_counter()
-    inference_time = inference_end - inference_start
+    for r in range(args.runs):
+        transfer_in_start = time.perf_counter()
+        batch_input_gpu = batch_input_cpu.to(device)
+        torch.cuda.synchronize()
+        transfer_in_time = time.perf_counter() - transfer_in_start
 
-    # 3. Measure data transfer time: GPU -> CPU
-    transfer_out_start = time.perf_counter()
-    # To properly measure transfer out of all data, we move all outputs back
-    outputs_cpu = [out.to("cpu") for out in outputs_gpu]
-    # Also synchronize to ensure transfers are done
-    torch.cuda.synchronize()
-    transfer_out_end = time.perf_counter()
-    transfer_out_time = transfer_out_end - transfer_out_start
+        inference_start = time.perf_counter()
+        outputs_gpu = []
+        with torch.no_grad():
+            cursor = 0
+            while cursor < num_inputs:
+                end_idx = min(cursor + max_bs, num_inputs)
+                if args.schema == "mmcp":
+                    batch = batch_input_gpu[3 * cursor : 3 * end_idx, :, :]
+                else:
+                    batch = batch_input_gpu[cursor:end_idx]
+                
+                out = model(batch)
+                outputs_gpu.append(out)
+                cursor = end_idx
+        torch.cuda.synchronize()
+        inference_time = time.perf_counter() - inference_start
 
-    total_time = transfer_in_time + inference_time + transfer_out_time
+        transfer_out_start = time.perf_counter()
+        outputs_cpu = [out.to("cpu") for out in outputs_gpu]
+        torch.cuda.synchronize()
+        transfer_out_time = time.perf_counter() - transfer_out_start
 
-    print(f"\nBenchmark Results for {args.model} ({num_inputs} inputs):")
-    print(f"  Transfer CPU -> GPU: {transfer_in_time:.4f}s")
-    print(f"  Actual Inference:    {inference_time:.4f}s")
-    print(f"  Transfer GPU -> CPU: {transfer_out_time:.4f}s")
-    print(f"  ------------------------------")
-    print(f"  Total Time:          {total_time:.4f}s")
+        total_time = transfer_in_time + inference_time + transfer_out_time
+        total_times.append(total_time)
+        
+        print(f"Run {r+1}/{args.runs}: {total_time:.4f}s")
+        
+        # Cleanup to prevent OOM
+        del batch_input_gpu
+        del outputs_gpu
+        del outputs_cpu
+        torch.cuda.empty_cache()
+
+    total_times = np.array(total_times)
+    median = np.median(total_times)
+    mean_arith = np.mean(total_times)
+    mean_geom = np.exp(np.mean(np.log(total_times)))
+    variance = np.var(total_times, ddof=1)
     
-    # Simple CSV-style output for easy parsing
-    print(f"RESULT_GPU:{args.model},{num_inputs},{transfer_in_time:.4f},{inference_time:.4f},{transfer_out_time:.4f},{total_time:.4f}")
+    # 95% CI (1.96 * std / sqrt(N))
+    std_dev = np.std(total_times, ddof=1)
+    ci_margin = 1.96 * (std_dev / np.sqrt(args.runs))
+    ci_lower = mean_arith - ci_margin
+    ci_upper = mean_arith + ci_margin
+
+    print(f"\\nBenchmark Results for {args.model} ({num_inputs} inputs, {args.runs} runs):")
+    print(f"  Median: {median:.4f}s")
+    print(f"  Arith Mean: {mean_arith:.4f}s")
+    print(f"  Geom Mean: {mean_geom:.4f}s")
+    print(f"  Variance: {variance:.6f}")
+    print(f"  95% CI: [{ci_lower:.4f}s, {ci_upper:.4f}s]")
+    
+    csv_file = "gpu_stats_results.csv"
+    write_header = not os.path.exists(csv_file)
+    with open(csv_file, "a") as f:
+        if write_header:
+            runs_cols = ",".join([f"run_{i+1}" for i in range(args.runs)])
+            f.write(f"model,schema,num_inputs,{runs_cols},median,mean_arith,mean_geom,variance,ci_lower,ci_upper\n")
+        
+        runs_vals = ",".join([f"{t:.4f}" for t in total_times])
+        model_basename = os.path.basename(args.model)
+        f.write(f"{model_basename},{args.schema},{num_inputs},{runs_vals},{median:.4f},{mean_arith:.4f},{mean_geom:.4f},{variance:.6f},{ci_lower:.4f},{ci_upper:.4f}\n")
 
 if __name__ == "__main__":
     main()

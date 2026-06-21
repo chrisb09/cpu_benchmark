@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <thread>
 #include <mpi.h>
 #include <unistd.h>
 #include <sys/resource.h>
@@ -35,6 +36,9 @@ int main(int argc, char** argv) {
     std::string model_path = "";
     std::string schema = "mini_app";
     int total_inputs = 100000;
+    int batch_size = 0;
+    int min_batch_size = 0;
+    int min_batch_timeout = 0;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -42,6 +46,9 @@ int main(int argc, char** argv) {
         else if (arg == "--model" && i + 1 < argc) model_path = argv[++i];
         else if (arg == "--schema" && i + 1 < argc) schema = argv[++i];
         else if (arg == "--inputs" && i + 1 < argc) total_inputs = std::stoi(argv[++i]);
+        else if (arg == "--batch-size" && i + 1 < argc) batch_size = std::stoi(argv[++i]);
+        else if (arg == "--min-batch-size" && i + 1 < argc) min_batch_size = std::stoi(argv[++i]);
+        else if (arg == "--min-batch-timeout" && i + 1 < argc) min_batch_timeout = std::stoi(argv[++i]);
     }
 
     int world_rank = 0, world_size = 1;
@@ -53,19 +60,19 @@ int main(int argc, char** argv) {
         inputs_per_rank += total_inputs % world_size;
     }
 
-    int max_bs = (schema == "mmcp") ? 5000 : 100000;
-    int current_bs = std::min(inputs_per_rank, max_bs);
-    if (current_bs == 0) current_bs = 1;
+    int current_bs = inputs_per_rank;
+    int num_batches = 1;
 
-    int num_batches = (inputs_per_rank + current_bs - 1) / current_bs;
+    // We can also simulate batches if needed, but for now we just process everything in 1 batch.
+    // If the benchmark is for smartsim server-side batching, we just send all our data at once.
 
     std::vector<int> in_shape, out_shape;
     size_t in_size = 0, out_size = 0;
     if (schema == "mmcp") {
-        in_shape = {5, current_bs, 512};
-        in_size = 5 * current_bs * 512;
-        out_shape = {5, 2, 512}; // Model outputs [5, 2, 512] regardless of batch size
-        out_size = 5 * 2 * 512;
+        in_shape = {current_bs * 3, 10, 512};
+        in_size = current_bs * 3 * 10 * 512;
+        out_shape = {current_bs * 3, 2, 512};
+        out_size = current_bs * 3 * 2 * 512;
     } else {
         in_shape = {current_bs, 18};
         in_size = current_bs * 18;
@@ -85,15 +92,31 @@ int main(int argc, char** argv) {
 
     MLCouplingProvider<float, float>* prov = nullptr;
     if (provider == "AIX") {
-        prov = new MLCouplingProviderAixelerator<float, float>(model_path, 1, MPI_COMM_WORLD, false);
+        prov = new MLCouplingProviderAixelerator<float, float>(model_path, current_bs, MPI_COMM_WORLD, false);
     } else if (provider == "PHYDLL") {
         prov = new MLCouplingProviderPhydll<float, float>(model_path, "TORCH", "CPU");
     } else if (provider == "SMARTSIM") {
-        prov = new MLCouplingProviderSmartsim<float, float>("CPU", "TORCH", model_path, "benchmark_model", "", -1, 1, 0, 0, 1, 0, 0, 900, 900, 900000);
+        prov = new MLCouplingProviderSmartsim<float, float>("CPU", "TORCH", model_path, "benchmark_model", "", -1, 1, 0, 0, batch_size, min_batch_size, min_batch_timeout, 2000, 2000, 2000000);
     } else {
         if (world_rank == 0) std::cerr << "Unknown provider: " << provider << std::endl;
         MPI_Finalize();
         return 1;
+    }
+
+    // NEW: Print how the ranks split the data
+    if (world_rank == 0 || world_rank == world_size - 1 || world_rank == 33) {
+        std::cout << "Rank " << world_rank << " split -> inputs_per_rank=" << inputs_per_rank << " | current_bs=" << current_bs << std::endl;
+    }
+
+    if (world_rank == 0) {
+        std::cout << "Provider: " << provider << " | Inputs/rank: " << inputs_per_rank 
+                  << " | Batches: " << num_batches << " | BS: " << current_bs;
+        if (provider == "SMARTSIM") {
+            std::cout << " | RedisAI batch_size=" << batch_size 
+                      << " min_batch_size=" << min_batch_size 
+                      << " min_batch_timeout=" << min_batch_timeout;
+        }
+        std::cout << std::endl;
     }
 
     auto* app = new BenchmarkApplication<float, float>(input_data, output_data);
@@ -109,6 +132,14 @@ int main(int argc, char** argv) {
         if (world_rank == 0) std::cout << "Starting inference loop for " << num_batches << " batches..." << std::endl;
         for (int b = 0; b < num_batches; ++b) {
             if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 starting..." << std::endl;
+            
+            // NEW: Print the shape of the data about to be sent
+            if (world_rank == 0 || world_rank == world_size - 1 || world_rank == 33) {
+                std::cout << "Rank " << world_rank << " before inference, shape=";
+                for (auto d : input_data[0].dimensions()) std::cout << d << " ";
+                std::cout << std::endl;
+            }
+
             coupling.ordered()
                 .set(input_data)
                 .inference()
@@ -117,6 +148,7 @@ int main(int argc, char** argv) {
         }
     } catch(const std::exception& e) {
         std::cerr << "Rank " << world_rank << " Exception: " << e.what() << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 

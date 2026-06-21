@@ -66,8 +66,8 @@ def main():
         warmup_input = torch.randn(1, 18, dtype=torch.float32)
         batch_input = torch.randn(inputs_per_rank, 18, dtype=torch.float32)
     elif args.schema == "mmcp":
-        warmup_input = torch.randn(args.seq_len, 1, args.feature_dim, dtype=torch.float32)
-        batch_input = torch.randn(args.seq_len, inputs_per_rank, args.feature_dim, dtype=torch.float32)
+        warmup_input = torch.randn(3 * 1, args.seq_len, args.feature_dim, dtype=torch.float32)
+        batch_input = torch.randn(3 * inputs_per_rank, args.seq_len, args.feature_dim, dtype=torch.float32)
 
     # count warmup time
     warmup_start = time.perf_counter()
@@ -83,7 +83,7 @@ def main():
     canary_size = min(max_bs, max(1, inputs_per_rank // 100))
     
     if args.schema == "mmcp":
-        canary_input = batch_input[:, :canary_size, :]
+        canary_input = batch_input[:3 * canary_size, :, :]
     else:
         canary_input = batch_input[:canary_size]
 
@@ -122,7 +122,7 @@ def main():
         while cursor < inputs_per_rank:
             end_idx = min(cursor + max_bs, inputs_per_rank)
             if args.schema == "mmcp":
-                batch = batch_input[:, cursor:end_idx, :]
+                batch = batch_input[3 * cursor : 3 * end_idx, :, :]
             else:
                 batch = batch_input[cursor:end_idx]
             

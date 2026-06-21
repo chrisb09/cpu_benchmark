@@ -64,7 +64,8 @@ target_include_directories(benchmark_solver PRIVATE
 # Crucial: the cpp_ml_interface_library needs to find our generated_registry.hpp too
 target_include_directories(cpp_ml_interface_library PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
-target_link_libraries(benchmark_solver PRIVATE cpp_ml_interface_headers cpp_ml_interface_library)
+target_link_libraries(benchmark_solver PRIVATE cpp_ml_interface_headers cpp_ml_interface_library /cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/extras/CUPTI/lib64/libcupti.so.12)
+target_link_options(benchmark_solver PRIVATE "-Wl,--unresolved-symbols=ignore-all")
 
 find_package(MPI)
 if(MPI_FOUND)
