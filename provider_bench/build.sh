@@ -14,6 +14,6 @@ cd ${BUILD_DIR}
 
 cmake .. -DCMAKE_BUILD_TYPE=Release
 
-NUM_CORES=$(nproc)
-
-cmake --build . -j ${NUM_CORES}
+build_jobs="${SLURM_CPUS_ON_NODE:-$(nproc)}"
+echo "Building with -j${build_jobs} parallel jobs..."
+cmake --build . -j ${build_jobs}
