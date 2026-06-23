@@ -56,3 +56,32 @@ The notebook `final_c23mm_analysis.ipynb` is regenerated and executed using the 
 
 * **Multiplexing Slowdown (Cache Thrashing)**: For the 699 MB `mmcp_transformer` model, model multiplexing took **~128.5 seconds** per inference compared to **~19.0 seconds** in the single shared model key configuration. When ranks share a single read-only key, the model weights reside compactly in the CPU's shared L3/L2 caches. With 96 multiplexed keys, the active weight set grows to **~67 GB** in memory, saturating the DRAM memory bus and causing continuous cache thrashing.
 * **Small Model Overhead**: For models under 1 MB, the cache thrashing is avoided, but multiplexing remains slightly slower than single shared key due to Redis socket/lookup overhead.
+
+---
+
+## 5. `MLCOUPLING_MULTI_MODEL` Environment Variable
+
+The benchmark solver and the C++ `MLCouplingProviderSmartsim` both check the
+`MLCOUPLING_MULTI_MODEL` environment variable. When set:
+
+* The benchmark solver appends `_world_rank` to the model name
+  (`benchmark_model_0`..`benchmark_model_95`), so each rank uploads its
+  own model under a unique Redis key.
+* The SmartSim provider expands the `if (rank == 0)` upload guard to
+  `if (rank == 0 || is_multi)`, allowing every rank to execute
+  `set_model_from_file`.
+
+**This is a benchmarking / research-only knob, not a production feature.**
+For the 1.6 GB `giant` model, 96 multiplexed keys require ~153 GB of disk
+space and even more RAM after TorchScript loading — large enough to OOM
+the 512 GB `c23mm` node (the orchestrator process is killed with
+`exit code 137` by the Linux OOM killer). For the 699 MB `mmcp_transformer`
+model it survives but is ~6.8× slower than the single-shared-key
+configuration due to L3 cache thrashing. For models under a few MB the
+overhead is small but the configuration still has no production
+benefit.
+
+Recommended use: only as a stress test for the SmartSim database's
+per-key upload path. In any real coupling scenario prefer the default
+single-shared-key upload (rank 0 only) and let the database multiplex
+inference.
