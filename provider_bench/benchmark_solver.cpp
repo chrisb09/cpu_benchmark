@@ -96,7 +96,11 @@ int main(int argc, char** argv) {
     } else if (provider == "PHYDLL") {
         prov = new MLCouplingProviderPhydll<float, float>(model_path, "TORCH", "CPU");
     } else if (provider == "SMARTSIM") {
-        prov = new MLCouplingProviderSmartsim<float, float>("CPU", "TORCH", model_path, "benchmark_model", "", -1, 1, 0, 0, batch_size, min_batch_size, min_batch_timeout, 2000, 2000, 2000000);
+        std::string m_name = "benchmark_model";
+        if (std::getenv("MLCOUPLING_MULTI_MODEL") != nullptr) {
+            m_name += "_" + std::to_string(world_rank);
+        }
+        prov = new MLCouplingProviderSmartsim<float, float>("CPU", "TORCH", model_path, m_name, "", -1, 1, 0, 0, batch_size, min_batch_size, min_batch_timeout, 2000, 2000, 2000000);
     } else {
         if (world_rank == 0) std::cerr << "Unknown provider: " << provider << std::endl;
         MPI_Finalize();
