@@ -85,3 +85,39 @@ Recommended use: only as a stress test for the SmartSim database's
 per-key upload path. In any real coupling scenario prefer the default
 single-shared-key upload (rank 0 only) and let the database multiplex
 inference.
+
+---
+
+## 6. c23ml Giant-Only Exception (OOM Rerun)
+
+### Motivation
+The 96-way multiplexed run (`SS_TPQ96_I1_B96_MULTI`) completed for all models on `c23mm` **except** `giant` (1.6 GB), where 96 × 1.6 GB ≈ 154 GB of weights plus the TorchScript execution overhead pushed the Redis DB past the 500 GB physical memory limit and the OOM-killer terminated the DB process (`exit code 137`).
+
+The CLAIX `c23ml` partition provides the same Sapphire Rapids nodes (96 cores) but with **~1 TB RAM** per node (only 2 nodes available: `n23m0289`, `n23m0290`). This is large enough to host the 96 multiplexed `giant` instances without OOM. The smaller models are not rerun on `c23ml` — they already succeeded on `c23mm` and would only consume extra wall-clock on a busy 2-node partition.
+
+### Generator Exception
+The standard pipeline (`provider_bench/submit_benchmarks.py`) is **not** modified:
+* Its hardcoded `configs` list would either re-submit all 16 standard configs on `c23ml` (wasteful) or require per-config partition/multi-model plumbing, complicating the generator for a single use case.
+* The `MULTI` script is already a hand-maintained one-off (the only config outside the generator's templated set), so extending that pattern is consistent.
+
+### Implementation
+A new sibling result tree is created:
+```
+provider_bench/results_c23ml/
+├── logs/                                          # 10x giant_SS_TPQ96_I1_B96_MULTI_giant_run{1..10}.log
+├── scripts/SS_TPQ96_I1_B96_MULTI_giant.sh         # this exception's batch script
+├── smartsim_experiments_SS_TPQ96_I1_B96_MULTI_giant/  # SmartSim exp dir
+└── SS_TPQ96_I1_B96_MULTI_giant.csv                # results (10 rows)
+```
+
+The script is a near-clone of `results_c23mm/scripts/SS_TPQ96_I1_B96_MULTI.sh` with:
+* `#SBATCH --partition=c23ml` (and same `thes2181` account, `--exclusive`).
+* `MODELS=("giant|100000|mini_app|.../giant_cpu.pt")` — giant only.
+* Output paths under `results_c23ml/`.
+* `LABEL="${MODEL_NAME}_${PNAME}_c23ml"` so the row is identifiable in the CSV.
+* The same per-model DB-restart isolation as a safety net (with a single model, the loop runs once).
+* `set -e` and `FAILED_RC_137` capture remain so the CSV will record a clean `SUCCESS` if the OOM is resolved, or a `FAILED_RC_137` if the larger memory is still insufficient (e.g. due to additional torch runtime overhead).
+
+### Expected Outcome
+* The OOM should be resolved on `c23ml` (~1 TB RAM vs. ~500 GB required).
+* Inference time is expected to **remain slow** (cache-thrashing floor from §4), but with a clean `SUCCESS` row this confirms the previously observed `giant` OOM was a pure memory-capacity issue, not a fundamental model-architecture incompatibility with multiplexing.
