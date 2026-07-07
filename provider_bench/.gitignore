@@ -12,8 +12,12 @@ smartsim_experiments/
 __pycache__/
 results_c23mm/logs/
 results_c23mm/scripts/
+!results_c23mm/scripts/
+results_c23mm/scripts/*
+!results_c23mm/scripts/run_phydll_c23mm.sh
+!results_c23mm/scripts/PHYDLL_CPP_DLR96_I1.sh
+!results_c23mm/scripts/PHYDLL_PY_DLR96_I1.sh
 results_c23mm/.ssdb_endpoint*
 results_c23mm/.solver_done*
 results_c23mm/*.csv
 results_c23mm/smartsim_experiments*
-
