@@ -9,7 +9,9 @@
 #include <sys/resource.h>
 
 #include "ml_coupling.hpp"
+#ifdef WITH_AIX
 #include "provider/ml_coupling_provider_aixelerator.hpp"
+#endif
 #include "provider/ml_coupling_provider_smartsim.hpp"
 #include "provider/ml_coupling_provider_phydll.hpp"
 #include "application/ml_coupling_application.hpp"
@@ -25,12 +27,22 @@ public:
 protected:
     MLCouplingData<In> preprocess(MLCouplingData<In> input_data) override { return input_data; }
     void coupling_step(MLCouplingData<In>) override {}
-    MLCouplingData<Out> ml_step(MLCouplingData<In>) override { return this->output_data_before_postprocessing; }
     MLCouplingData<Out> postprocess(MLCouplingData<Out> output_data) override { return output_data; }
 };
 
 int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
+
+    int world_rank = 0, world_size = 1;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+    // Create solver-only communicator (DL client ranks use different color)
+    MPI_Comm solver_comm = MPI_COMM_NULL;
+    MPI_Comm_split(MPI_COMM_WORLD, 0, world_rank, &solver_comm);
+
+    if (solver_comm != MPI_COMM_NULL) {
+        MPI_Comm_size(solver_comm, &world_size);
+    }
 
     std::string provider = "AIX";
     std::string model_path = "";
@@ -50,10 +62,6 @@ int main(int argc, char** argv) {
         else if (arg == "--min-batch-size" && i + 1 < argc) min_batch_size = std::stoi(argv[++i]);
         else if (arg == "--min-batch-timeout" && i + 1 < argc) min_batch_timeout = std::stoi(argv[++i]);
     }
-
-    int world_rank = 0, world_size = 1;
-    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
     int inputs_per_rank = total_inputs / world_size;
     if (world_rank == world_size - 1) {
@@ -92,7 +100,13 @@ int main(int argc, char** argv) {
 
     MLCouplingProvider<float, float>* prov = nullptr;
     if (provider == "AIX") {
-        prov = new MLCouplingProviderAixelerator<float, float>(model_path, current_bs, MPI_COMM_WORLD, false);
+#ifdef WITH_AIX
+        prov = new MLCouplingProviderAixelerator<float, float>(model_path, current_bs, solver_comm, false);
+#else
+        if (world_rank == 0) std::cerr << "AIX provider not compiled into this benchmark_solver build." << std::endl;
+        MPI_Finalize();
+        return 1;
+#endif
     } else if (provider == "PHYDLL") {
         prov = new MLCouplingProviderPhydll<float, float>(model_path, "TORCH", "CPU");
     } else if (provider == "SMARTSIM") {
@@ -129,7 +143,7 @@ int main(int argc, char** argv) {
     MLCoupling<float, float> coupling(prov, app, beh, CouplingType::STATIC, &(app->input_data_after_preprocessing), &(app->output_data_before_postprocessing));
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(solver_comm);
     auto start = std::chrono::high_resolution_clock::now();
 
     try {
@@ -153,10 +167,10 @@ int main(int argc, char** argv) {
     } catch(const std::exception& e) {
         std::cerr << "Rank " << world_rank << " Exception: " << e.what() << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(2));
-        MPI_Abort(MPI_COMM_WORLD, 1);
+        MPI_Abort(solver_comm, 1);
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(solver_comm);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
 
@@ -168,8 +182,8 @@ int main(int argc, char** argv) {
     double max_elapsed = 0.0;
     double sum_mem = 0.0;
     
-    MPI_Reduce(&local_elapsed, &max_elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&mem_mb, &sum_mem, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_elapsed, &max_elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, solver_comm);
+    MPI_Reduce(&mem_mb, &sum_mem, 1, MPI_DOUBLE, MPI_SUM, 0, solver_comm);
 
     if (world_rank == 0) {
         std::cout << "RESULT:" << max_elapsed << "," << sum_mem << std::endl;

@@ -19,16 +19,56 @@ set -e
 BENCH_DIR="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}"
 BASE_DIR="$(cd "${BENCH_DIR}/../.." && pwd)"
 PYTHON_RUNTIME_ROOT="${BASE_DIR}/CPP-ML-Interface/extern/python"
+PROVIDER_FILTER="${PROVIDER_FILTER:-}"
+MODEL_FILTER="${MODEL_FILTER:-}"
+NP_SOLVER="${NP_SOLVER:-96}"
+NP_DL="${NP_DL:-${NP_SOLVER}}"
+PROVIDER_BENCH_WITH_AIX="${PROVIDER_BENCH_WITH_AIX:-ON}"
+BENCH_QUEUE_SUCCESSOR="${BENCH_QUEUE_SUCCESSOR:-1}"
+PHYDLL_TIMEOUT="${PHYDLL_TIMEOUT:-600}"
+SOLVER_BIN="${BENCH_DIR}/build/benchmark_solver"
+
+# Score-P mode parsing (env default, CLI flag overrides)
+SCOREP_MODE="${SCOREP_MODE:-auto}"
+CLEAN=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --scorep) SCOREP_MODE="$2"; shift 2 ;;
+        --clean)  CLEAN=1; shift ;;
+        *)        echo "Unknown argument: $1"; exit 1 ;;
+    esac
+done
+
+# Derive USE_SCOREP, AIX install prefix, and dl_clients WITH_SCOREP from SCOREP_MODE
+case "$SCOREP_MODE" in
+    on)
+        export USE_SCOREP=1
+        AIXELERATOR_INSTALL_PREFIX="${BASE_DIR}/CPP-ML-Interface/extern/AIxeleratorService/INSTALL-SCOREP"
+        AIXELERATOR_CMAKE_ARGS="-DWITH_TORCH=ON -DWITH_SCOREP=ON -DBUILD_TESTS=OFF"
+        WITH_SCOREP_DL="ON"
+        ;;
+    off|auto|*)
+        export USE_SCOREP=0
+        AIXELERATOR_INSTALL_PREFIX="${BASE_DIR}/CPP-ML-Interface/extern/AIxeleratorService/INSTALL"
+        AIXELERATOR_CMAKE_ARGS="-DWITH_TORCH=ON -DBUILD_TESTS=OFF"
+        WITH_SCOREP_DL="OFF"
+        ;;
+esac
 
 echo "Running provider benchmarks"
 echo "Base Directory: ${BASE_DIR}"
 echo "Script Directory: ${BENCH_DIR}"
+echo "Score-P Mode: ${SCOREP_MODE}"
+echo "AIX install prefix: ${AIXELERATOR_INSTALL_PREFIX}"
 
 cd "/hpcwork/ro092286/smartsim/CPP-ML-Interface" && source ./install.sh cpu
 
 export SR_MODEL_TIMEOUT=2000000
 export SR_CMD_TIMEOUT=2000000
 export SR_SOCKET_TIMEOUT=2000000
+export TMPDIR="${TMPDIR:-/tmp}"
+export OMPI_MCA_orte_tmpdir_base="${TMPDIR}"
+export OMPI_MCA_shmem_mmap_enable_nfs_warning=0
 
 RUNTIME_DEVICE="smartsim_cpu"
 SMARTSIM_PYTHON="${PYTHON_RUNTIME_ROOT}/${RUNTIME_DEVICE}/bin/python"
@@ -40,18 +80,59 @@ if [ -d "${RUNTIME_EXTRA_LIB_DIR}" ]; then
 fi
 PHYDLL_LIB_DIR="$(cd "${BASE_DIR}/CPP-ML-Interface/extern/phydll/build/lib" && pwd)"
 export LD_LIBRARY_PATH="${PHYDLL_LIB_DIR}:${LD_LIBRARY_PATH:-}"
+CUDA_STUB_SOURCE="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libcuda.so"
+NVML_STUB_SOURCE="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libnvidia-ml.so"
+CUDA_STUB_DIR="${BENCH_DIR}/build/cuda_stubs"
+mkdir -p "$BENCH_DIR/build"
+mkdir -p "${CUDA_STUB_DIR}"
+ln -sf "${CUDA_STUB_SOURCE}" "${CUDA_STUB_DIR}/libcuda.so"
+ln -sf "${CUDA_STUB_SOURCE}" "${CUDA_STUB_DIR}/libcuda.so.1"
+ln -sf "${NVML_STUB_SOURCE}" "${CUDA_STUB_DIR}/libnvidia-ml.so"
+ln -sf "${NVML_STUB_SOURCE}" "${CUDA_STUB_DIR}/libnvidia-ml.so.1"
+export LD_LIBRARY_PATH="${CUDA_STUB_DIR}:${LD_LIBRARY_PATH:-}"
 
 mkdir -p "$BENCH_DIR/build" "$BENCH_DIR/logs"
-cd "$BENCH_DIR/build"
-cmake .. -DSMARTSIM_PYTHON="${SMARTSIM_PYTHON}" -DTorch_DIR="${BASE_DIR}/CPP-ML-Interface/extern/libtorch/share/cmake/Torch"
-make -j
 
-if [ "${1:-}" = "--clean" ]; then
-    echo "Cleaning previous benchmark state..."
-    rm -f "$BENCH_DIR/started.txt" "$BENCH_DIR/combinations.txt" "$BENCH_DIR/provider_results.csv"
+# Only rebuild if binary is missing or source changed
+NEED_REBUILD=0
+if [ ! -x "$BENCH_DIR/build/benchmark_solver" ]; then
+    NEED_REBUILD=1
 fi
 
-RESULTS_CSV="$BENCH_DIR/provider_results.csv"
+if [ "$NEED_REBUILD" -eq 1 ]; then
+    cd "$BENCH_DIR/build"
+    cmake .. \
+        -DSMARTSIM_PYTHON="${SMARTSIM_PYTHON}" \
+        -DTorch_DIR="${BASE_DIR}/CPP-ML-Interface/extern/libtorch/share/cmake/Torch" \
+        -DPROVIDER_BENCH_WITH_AIX="${PROVIDER_BENCH_WITH_AIX}" \
+        -DAIXELERATOR_PREBUILT_INSTALL_PREFIX="${AIXELERATOR_INSTALL_PREFIX}" \
+        -DAIXELERATOR_PREBUILT_LIB_DIR="${AIXELERATOR_INSTALL_PREFIX}/lib" \
+        -DAIXELERATOR_CMAKE_ARGS="${AIXELERATOR_CMAKE_ARGS}"
+    make -j2
+fi
+
+mkdir -p "${BASE_DIR}/CPP-ML-Interface/dl_clients/build"
+if [ ! -x "${BASE_DIR}/CPP-ML-Interface/dl_clients/build/phydll_dl_client" ]; then
+    cmake -S "${BASE_DIR}/CPP-ML-Interface/dl_clients" \
+        -B "${BASE_DIR}/CPP-ML-Interface/dl_clients/build" \
+        -DLIBTORCH_DIR="${BASE_DIR}/CPP-ML-Interface/extern/libtorch" \
+        -DPHYDLL_BUILD_DIR="${BASE_DIR}/CPP-ML-Interface/extern/phydll/build" \
+        -DCUDA_CUDA_LIB="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libcuda.so" \
+        -DCUDA_cuda_driver_LIBRARY="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libcuda.so" \
+        -DWITH_SCOREP="${WITH_SCOREP_DL}"
+    cmake --build "${BASE_DIR}/CPP-ML-Interface/dl_clients/build" -j2
+fi
+
+RESULTS_CSV="${BENCH_RESULTS_CSV:-$BENCH_DIR/provider_results.csv}"
+STATE_ID="${BENCH_STATE_ID:-$(basename "$RESULTS_CSV" .csv)}"
+STARTED_FILE="$BENCH_DIR/started_${STATE_ID}.txt"
+COMBINATIONS_FILE="$BENCH_DIR/combinations_${STATE_ID}.txt"
+
+if [ "$CLEAN" -eq 1 ]; then
+    echo "Cleaning previous benchmark state..."
+    rm -f "$STARTED_FILE" "$COMBINATIONS_FILE" "$RESULTS_CSV"
+fi
+
 if [ ! -f "$RESULTS_CSV" ] || ! grep -q "label" "$RESULTS_CSV"; then
     echo "label,model,provider,tpq,intra_threads,bind_cores,time_s,max_rss_mb,status" > "$RESULTS_CSV"
 fi
@@ -80,6 +161,7 @@ watercnn|10000000|mini_app|${BASE_DIR}/mini_app/train_models/model_a/watercnn_cp
 #   SS_NOBIND                    - SmartSim default threads, no binding
 #   SS_TPQ=N_I=M_B=96            - Explicit TPQ+intra, always bind 96 cores (best practice)
 #   SS_TPQ=96_I=1_NOBIND         - intra=1 case: binding 1 core makes no sense, use nobind
+#   PHYDLL_{CPP,PY}_DLR=N_I=M    - N DL ranks, M Torch intra-op threads per DL rank
 PROVIDERS="
 AIX|N/A|N/A|N/A|N/A
 SS_DEFAULT|N/A|N/A|-1|--use-default-cpu-settings
@@ -92,25 +174,32 @@ SS_TPQ=24_I=4_B=96|24|4|96|--threads-per-queue 24 --intra-op-threads 4 --cpu-cor
 SS_TPQ=48_I=2_B=96|48|2|96|--threads-per-queue 48 --intra-op-threads 2 --cpu-cores-per-node 96
 SS_TPQ=96_I=1_NOBIND|96|1|0|--threads-per-queue 96 --intra-op-threads 1 --no-cpu-bind
 SS_TPQ=96_I=1_B=96|96|1|96|--threads-per-queue 96 --intra-op-threads 1 --cpu-cores-per-node 96
+PHYDLL_CPP_DLR96_I1|96|1|0|cpp
+PHYDLL_PY_DLR96_I1|96|1|0|py
 "
 
-NP_SOLVER=96
 export MLCOUPLING_LOG_LEVEL=DEBUG
 
-# Build combinations.txt
-if [ ! -f "$BENCH_DIR/combinations.txt" ]; then
+# Build combinations file for this run/result set.
+if [ ! -f "$COMBINATIONS_FILE" ]; then
     while IFS='|' read -r PNAME TPQ INTRA BIND SS_ARGS; do
         [ -z "$PNAME" ] && continue
+        if [ -n "$PROVIDER_FILTER" ] && [[ "$PNAME" != *"$PROVIDER_FILTER"* ]]; then
+            continue
+        fi
         while IFS='|' read -r MODEL_NAME INPUTS SCHEMA MODEL_PATH; do
             [ -z "$MODEL_NAME" ] && continue
-            echo "${MODEL_NAME}|${INPUTS}|${SCHEMA}|${MODEL_PATH}|${PNAME}|${TPQ}|${INTRA}|${BIND}|${SS_ARGS}" >> "$BENCH_DIR/combinations.txt"
+            if [ -n "$MODEL_FILTER" ] && [[ "$MODEL_NAME" != *"$MODEL_FILTER"* ]]; then
+                continue
+            fi
+            echo "${MODEL_NAME}|${INPUTS}|${SCHEMA}|${MODEL_PATH}|${PNAME}|${TPQ}|${INTRA}|${BIND}|${SS_ARGS}" >> "$COMBINATIONS_FILE"
         done <<< "$(echo "$MODELS" | grep -v '^$')"
     done <<< "$(echo "$PROVIDERS" | grep -v '^$')"
 fi
 
-if [ ! -f "$BENCH_DIR/started.txt" ]; then echo "0" > "$BENCH_DIR/started.txt"; fi
-TOTAL_TASKS=$(wc -l < "$BENCH_DIR/combinations.txt")
-STARTED=$(cat "$BENCH_DIR/started.txt")
+if [ ! -f "$STARTED_FILE" ]; then echo "0" > "$STARTED_FILE"; fi
+TOTAL_TASKS=$(wc -l < "$COMBINATIONS_FILE")
+STARTED=$(cat "$STARTED_FILE")
 
 if [ "$STARTED" -ge "$TOTAL_TASKS" ]; then
     echo "All tasks already completed ($STARTED/$TOTAL_TASKS)."
@@ -118,7 +207,7 @@ if [ "$STARTED" -ge "$TOTAL_TASKS" ]; then
 fi
 
 # Queue successor
-if [ -n "${SLURM_JOB_ID:-}" ]; then
+if [ -n "${SLURM_JOB_ID:-}" ] && [ "$BENCH_QUEUE_SUCCESSOR" != "0" ]; then
     echo "Work remaining ($STARTED/$TOTAL_TASKS). Scheduling successor..."
     CUR_PARTITION="${SLURM_JOB_PARTITION:-devel}"
     CUR_ACCOUNT="${SLURM_JOB_ACCOUNT:-default}"
@@ -129,6 +218,7 @@ if [ -n "${SLURM_JOB_ID:-}" ]; then
         --partition="$CUR_PARTITION" \
         --account="$CUR_ACCOUNT" \
         "${MEM_ARGS[@]}" \
+        --export=ALL,PROVIDER_FILTER="$PROVIDER_FILTER",MODEL_FILTER="$MODEL_FILTER",BENCH_RESULTS_CSV="$RESULTS_CSV",BENCH_STATE_ID="$STATE_ID",NP_SOLVER="$NP_SOLVER",NP_DL="$NP_DL",PROVIDER_BENCH_WITH_AIX="$PROVIDER_BENCH_WITH_AIX",BENCH_QUEUE_SUCCESSOR="$BENCH_QUEUE_SUCCESSOR",PHYDLL_TIMEOUT="$PHYDLL_TIMEOUT",SCOREP_MODE="$SCOREP_MODE" \
         --time="01:00:00" \
         --ntasks=96 \
         --cpus-per-task=1 \
@@ -142,13 +232,13 @@ while [ "$STARTED" -lt "$TOTAL_TASKS" ]; do
     fi
 
     LINE_NUM=$(( STARTED + 1 ))
-    COMBO=$(sed -n "${LINE_NUM}p" "$BENCH_DIR/combinations.txt")
+    COMBO=$(sed -n "${LINE_NUM}p" "$COMBINATIONS_FILE")
     IFS='|' read -r MODEL_NAME INPUTS SCHEMA MODEL_PATH PNAME TPQ INTRA BIND SS_ARGS <<< "$COMBO"
 
     # Build the label: model_providerName
     LABEL="${MODEL_NAME}_${PNAME}"
 
-    echo "$LINE_NUM" > "$BENCH_DIR/started.txt"
+    echo "$LINE_NUM" > "$STARTED_FILE"
     STARTED=$LINE_NUM
 
     echo "$LABEL,$MODEL_NAME,$PNAME,$TPQ,$INTRA,$BIND,-1,-1,RUNNING" >> "$RESULTS_CSV"
@@ -162,7 +252,7 @@ while [ "$STARTED" -lt "$TOTAL_TASKS" ]; do
     RC=0
 
     if [ "$PNAME" = "AIX" ]; then
-        mpirun -n ${NP_SOLVER} ./benchmark_solver \
+        mpirun -n ${NP_SOLVER} "${SOLVER_BIN}" \
             --provider AIX --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
             > "$OUTPUT_FILE" 2>&1
         RC=$?
@@ -195,7 +285,7 @@ while [ "$STARTED" -lt "$TOTAL_TASKS" ]; do
         else
             export SSDB="$(tr -d '\n' < "${ENDPOINT_FILE}")"
 
-            mpirun -n ${NP_SOLVER} ./benchmark_solver \
+            mpirun -n ${NP_SOLVER} "${SOLVER_BIN}" \
                 --provider SMARTSIM --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
                 > "$OUTPUT_FILE" 2>&1
             RC=$?
@@ -205,11 +295,38 @@ while [ "$STARTED" -lt "$TOTAL_TASKS" ]; do
         fi
 
     elif [ "$PNAME" = "PHYDLL_CPP" ]; then
+        : # Kept for compatibility with older combinations.txt files.
+        export MLCOUPLING_INTRA_OP_THREADS="${INTRA}"
+        unset MLCOUPLING_INTER_OP_THREADS
         PHYDLL_DL_CLIENT="${BASE_DIR}/CPP-ML-Interface/dl_clients/build/phydll_dl_client"
-        export PHYDLL_DL_COUNT=${NP_SOLVER}
-        mpirun --oversubscribe -n ${NP_SOLVER} ./benchmark_solver \
+        export PHYDLL_DL_COUNT=${NP_DL}
+        timeout "${PHYDLL_TIMEOUT}" mpirun --oversubscribe --bind-to none \
+            -x LD_LIBRARY_PATH -n ${NP_SOLVER} "${SOLVER_BIN}" \
             --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
-            : -n ${NP_SOLVER} "${PHYDLL_DL_CLIENT}" \
+            : -x LD_LIBRARY_PATH -n ${NP_DL} "${PHYDLL_DL_CLIENT}" \
+            > "$OUTPUT_FILE" 2>&1
+        RC=$?
+
+    elif [[ "$PNAME" == PHYDLL_CPP_* ]]; then
+        export MLCOUPLING_INTRA_OP_THREADS="${INTRA}"
+        unset MLCOUPLING_INTER_OP_THREADS
+        PHYDLL_DL_CLIENT="${BASE_DIR}/CPP-ML-Interface/dl_clients/build/phydll_dl_client"
+        export PHYDLL_DL_COUNT=${NP_DL}
+        timeout "${PHYDLL_TIMEOUT}" mpirun --oversubscribe --bind-to none \
+            -x LD_LIBRARY_PATH -n ${NP_SOLVER} "${SOLVER_BIN}" \
+            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
+            : -x LD_LIBRARY_PATH -n ${NP_DL} "${PHYDLL_DL_CLIENT}" \
+            > "$OUTPUT_FILE" 2>&1
+        RC=$?
+
+    elif [[ "$PNAME" == PHYDLL_PY_* ]]; then
+        export MLCOUPLING_INTRA_OP_THREADS="${INTRA}"
+        unset MLCOUPLING_INTER_OP_THREADS
+        export PHYDLL_DL_COUNT=${NP_DL}
+        timeout "${PHYDLL_TIMEOUT}" mpirun --oversubscribe --bind-to none \
+            -x LD_LIBRARY_PATH -n ${NP_SOLVER} "${SOLVER_BIN}" \
+            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
+            : -x LD_LIBRARY_PATH -n ${NP_DL} "${SMARTSIM_PYTHON}" "${BASE_DIR}/CPP-ML-Interface/dl_clients/phydll_dl_client.py" \
             > "$OUTPUT_FILE" 2>&1
         RC=$?
     fi
