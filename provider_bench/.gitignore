@@ -19,5 +19,5 @@ results_c23mm/scripts/*
 !results_c23mm/scripts/PHYDLL_PY_DLR96_I1.sh
 results_c23mm/.ssdb_endpoint*
 results_c23mm/.solver_done*
-results_c23mm/*.csv
+!results_c23mm/*.csv
 results_c23mm/smartsim_experiments*
