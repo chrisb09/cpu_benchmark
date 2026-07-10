@@ -137,50 +137,52 @@ int main(int argc, char** argv) {
         std::cout << std::endl;
     }
 
-    auto* app = new BenchmarkApplication<float, float>(input_data, output_data);
-    auto* beh = new MLCouplingBehaviorDefault();
-
-    MLCoupling<float, float> coupling(prov, app, beh, CouplingType::STATIC, &(app->input_data_after_preprocessing), &(app->output_data_before_postprocessing));
-
-
-    MPI_Barrier(solver_comm);
-    auto start = std::chrono::high_resolution_clock::now();
-
-    try {
-        if (world_rank == 0) std::cout << "Starting inference loop for " << num_batches << " batches..." << std::endl;
-        for (int b = 0; b < num_batches; ++b) {
-            if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 starting..." << std::endl;
-            
-            // NEW: Print the shape of the data about to be sent
-            if (world_rank == 0 || world_rank == world_size - 1 || world_rank == 33) {
-                std::cout << "Rank " << world_rank << " before inference, shape=";
-                for (auto d : input_data[0].dimensions()) std::cout << d << " ";
-                std::cout << std::endl;
-            }
-
-            coupling.ordered()
-                .set(input_data)
-                .inference()
-                .get(output_data);
-            if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 complete!" << std::endl;
-        }
-    } catch(const std::exception& e) {
-        std::cerr << "Rank " << world_rank << " Exception: " << e.what() << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        MPI_Abort(solver_comm, 1);
-    }
-
-    MPI_Barrier(solver_comm);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-
-    struct rusage r_usage;
-    getrusage(RUSAGE_SELF, &r_usage);
-    double mem_mb = r_usage.ru_maxrss / 1024.0;
-
-    double local_elapsed = elapsed.count();
+    double local_elapsed = 0.0;
     double max_elapsed = 0.0;
+    double mem_mb = 0.0;
     double sum_mem = 0.0;
+
+    // Destroy the coupling before MPI_Finalize so the PhyDLL provider can
+    // signal and finalize the DL ranks while MPI is still available.
+    {
+        auto* app = new BenchmarkApplication<float, float>(input_data, output_data);
+        auto* beh = new MLCouplingBehaviorDefault();
+        MLCoupling<float, float> coupling(prov, app, beh, CouplingType::STATIC, &(app->input_data_after_preprocessing), &(app->output_data_before_postprocessing));
+
+        MPI_Barrier(solver_comm);
+        auto start = std::chrono::high_resolution_clock::now();
+
+        try {
+            if (world_rank == 0) std::cout << "Starting inference loop for " << num_batches << " batches..." << std::endl;
+            for (int b = 0; b < num_batches; ++b) {
+                if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 starting..." << std::endl;
+
+                if (world_rank == 0 || world_rank == world_size - 1 || world_rank == 33) {
+                    std::cout << "Rank " << world_rank << " before inference, shape=";
+                    for (auto d : input_data[0].dimensions()) std::cout << d << " ";
+                    std::cout << std::endl;
+                }
+
+                coupling.ordered()
+                    .set(input_data)
+                    .inference()
+                    .get(output_data);
+                if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 complete!" << std::endl;
+            }
+        } catch(const std::exception& e) {
+            std::cerr << "Rank " << world_rank << " Exception: " << e.what() << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            MPI_Abort(solver_comm, 1);
+        }
+
+        MPI_Barrier(solver_comm);
+        auto end = std::chrono::high_resolution_clock::now();
+        local_elapsed = std::chrono::duration<double>(end - start).count();
+
+        struct rusage r_usage;
+        getrusage(RUSAGE_SELF, &r_usage);
+        mem_mb = r_usage.ru_maxrss / 1024.0;
+    }
     
     MPI_Reduce(&local_elapsed, &max_elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, solver_comm);
     MPI_Reduce(&mem_mb, &sum_mem, 1, MPI_DOUBLE, MPI_SUM, 0, solver_comm);

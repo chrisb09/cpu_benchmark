@@ -26,7 +26,11 @@ NP_DL="${NP_DL:-${NP_SOLVER}}"
 PROVIDER_BENCH_WITH_AIX="${PROVIDER_BENCH_WITH_AIX:-ON}"
 BENCH_QUEUE_SUCCESSOR="${BENCH_QUEUE_SUCCESSOR:-1}"
 PHYDLL_TIMEOUT="${PHYDLL_TIMEOUT:-600}"
-SOLVER_BIN="${BENCH_DIR}/build/benchmark_solver"
+PHYDLL_INPUTS_OVERRIDE="${PHYDLL_INPUTS_OVERRIDE:-}"
+BUILD_DIR="${PROVIDER_BENCH_BUILD_DIR:-${BENCH_DIR}/build-provider-bench}"
+DL_BUILD_DIR="${PHYDLL_DL_BUILD_DIR:-${BUILD_DIR}/dl-client}"
+SOLVER_BIN="${BUILD_DIR}/benchmark_solver"
+PHYDLL_DL_CLIENT="${PHYDLL_DL_CLIENT:-${DL_BUILD_DIR}/phydll_dl_client}"
 
 # Score-P mode parsing (env default, CLI flag overrides)
 SCOREP_MODE="${SCOREP_MODE:-auto}"
@@ -55,13 +59,19 @@ case "$SCOREP_MODE" in
         ;;
 esac
 
+if [ "$SCOREP_MODE" = "on" ]; then
+    echo "Score-P provider_bench execution is not enabled in this validation phase." >&2
+    echo "Build and review the non-Score-P path first." >&2
+    exit 2
+fi
+
 echo "Running provider benchmarks"
 echo "Base Directory: ${BASE_DIR}"
 echo "Script Directory: ${BENCH_DIR}"
 echo "Score-P Mode: ${SCOREP_MODE}"
 echo "AIX install prefix: ${AIXELERATOR_INSTALL_PREFIX}"
 
-cd "/hpcwork/ro092286/smartsim/CPP-ML-Interface" && source ./install.sh cpu
+cd "${BASE_DIR}/CPP-ML-Interface" && source ./set_env_claix23_cuda12.4.sh
 
 export SR_MODEL_TIMEOUT=2000000
 export SR_CMD_TIMEOUT=2000000
@@ -82,8 +92,8 @@ PHYDLL_LIB_DIR="$(cd "${BASE_DIR}/CPP-ML-Interface/extern/phydll/build/lib" && p
 export LD_LIBRARY_PATH="${PHYDLL_LIB_DIR}:${LD_LIBRARY_PATH:-}"
 CUDA_STUB_SOURCE="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libcuda.so"
 NVML_STUB_SOURCE="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libnvidia-ml.so"
-CUDA_STUB_DIR="${BENCH_DIR}/build/cuda_stubs"
-mkdir -p "$BENCH_DIR/build"
+CUDA_STUB_DIR="${BUILD_DIR}/cuda_stubs"
+mkdir -p "$BUILD_DIR"
 mkdir -p "${CUDA_STUB_DIR}"
 ln -sf "${CUDA_STUB_SOURCE}" "${CUDA_STUB_DIR}/libcuda.so"
 ln -sf "${CUDA_STUB_SOURCE}" "${CUDA_STUB_DIR}/libcuda.so.1"
@@ -91,36 +101,14 @@ ln -sf "${NVML_STUB_SOURCE}" "${CUDA_STUB_DIR}/libnvidia-ml.so"
 ln -sf "${NVML_STUB_SOURCE}" "${CUDA_STUB_DIR}/libnvidia-ml.so.1"
 export LD_LIBRARY_PATH="${CUDA_STUB_DIR}:${LD_LIBRARY_PATH:-}"
 
-mkdir -p "$BENCH_DIR/build" "$BENCH_DIR/logs"
+mkdir -p "$BUILD_DIR" "$BENCH_DIR/logs"
 
-# Only rebuild if binary is missing or source changed
-NEED_REBUILD=0
-if [ ! -x "$BENCH_DIR/build/benchmark_solver" ]; then
-    NEED_REBUILD=1
-fi
-
-if [ "$NEED_REBUILD" -eq 1 ]; then
-    cd "$BENCH_DIR/build"
-    cmake .. \
-        -DSMARTSIM_PYTHON="${SMARTSIM_PYTHON}" \
-        -DTorch_DIR="${BASE_DIR}/CPP-ML-Interface/extern/libtorch/share/cmake/Torch" \
-        -DPROVIDER_BENCH_WITH_AIX="${PROVIDER_BENCH_WITH_AIX}" \
-        -DAIXELERATOR_PREBUILT_INSTALL_PREFIX="${AIXELERATOR_INSTALL_PREFIX}" \
-        -DAIXELERATOR_PREBUILT_LIB_DIR="${AIXELERATOR_INSTALL_PREFIX}/lib" \
-        -DAIXELERATOR_CMAKE_ARGS="${AIXELERATOR_CMAKE_ARGS}"
-    make -j2
-fi
-
-mkdir -p "${BASE_DIR}/CPP-ML-Interface/dl_clients/build"
-if [ ! -x "${BASE_DIR}/CPP-ML-Interface/dl_clients/build/phydll_dl_client" ]; then
-    cmake -S "${BASE_DIR}/CPP-ML-Interface/dl_clients" \
-        -B "${BASE_DIR}/CPP-ML-Interface/dl_clients/build" \
-        -DLIBTORCH_DIR="${BASE_DIR}/CPP-ML-Interface/extern/libtorch" \
-        -DPHYDLL_BUILD_DIR="${BASE_DIR}/CPP-ML-Interface/extern/phydll/build" \
-        -DCUDA_CUDA_LIB="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libcuda.so" \
-        -DCUDA_cuda_driver_LIBRARY="/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/stubs/lib64/libcuda.so" \
-        -DWITH_SCOREP="${WITH_SCOREP_DL}"
-    cmake --build "${BASE_DIR}/CPP-ML-Interface/dl_clients/build" -j2
+if [ ! -x "$SOLVER_BIN" ] || [ ! -x "$PHYDLL_DL_CLIENT" ]; then
+    echo "Provider-bench binaries are missing." >&2
+    echo "Run ${BENCH_DIR}/build.sh before starting a benchmark." >&2
+    echo "  solver: ${SOLVER_BIN}" >&2
+    echo "  DL client: ${PHYDLL_DL_CLIENT}" >&2
+    exit 1
 fi
 
 RESULTS_CSV="${BENCH_RESULTS_CSV:-$BENCH_DIR/provider_results.csv}"
@@ -247,6 +235,7 @@ while [ "$STARTED" -lt "$TOTAL_TASKS" ]; do
     echo "[$LINE_NUM/$TOTAL_TASKS] Model: $MODEL_NAME | Provider: $PNAME"
 
     OUTPUT_FILE="$BENCH_DIR/logs/${MODEL_NAME}_${PNAME}.log"
+    PHYDLL_INPUTS="${PHYDLL_INPUTS_OVERRIDE:-${INPUTS}}"
 
     set +e
     RC=0
@@ -297,36 +286,49 @@ while [ "$STARTED" -lt "$TOTAL_TASKS" ]; do
     elif [ "$PNAME" = "PHYDLL_CPP" ]; then
         : # Kept for compatibility with older combinations.txt files.
         export MLCOUPLING_INTRA_OP_THREADS="${INTRA}"
-        unset MLCOUPLING_INTER_OP_THREADS
-        PHYDLL_DL_CLIENT="${BASE_DIR}/CPP-ML-Interface/dl_clients/build/phydll_dl_client"
-        export PHYDLL_DL_COUNT=${NP_DL}
+        export MLCOUPLING_INTER_OP_THREADS=1
+        export PHYDLL_DL_COUNT=1
+        export PHYDLL_DL_FIELD_COUNT=1
         timeout "${PHYDLL_TIMEOUT}" mpirun --oversubscribe --bind-to none \
-            -x LD_LIBRARY_PATH -n ${NP_SOLVER} "${SOLVER_BIN}" \
-            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
-            : -x LD_LIBRARY_PATH -n ${NP_DL} "${PHYDLL_DL_CLIENT}" \
+            -x LD_LIBRARY_PATH -x PHYDLL_DL_COUNT -x PHYDLL_DL_FIELD_COUNT \
+            -x MLCOUPLING_INTRA_OP_THREADS -x MLCOUPLING_INTER_OP_THREADS \
+            -n ${NP_SOLVER} "${SOLVER_BIN}" \
+            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$PHYDLL_INPUTS" \
+            : -x LD_LIBRARY_PATH -x PHYDLL_DL_COUNT -x PHYDLL_DL_FIELD_COUNT \
+            -x MLCOUPLING_INTRA_OP_THREADS -x MLCOUPLING_INTER_OP_THREADS \
+            -n ${NP_DL} "${PHYDLL_DL_CLIENT}" \
             > "$OUTPUT_FILE" 2>&1
         RC=$?
 
     elif [[ "$PNAME" == PHYDLL_CPP_* ]]; then
         export MLCOUPLING_INTRA_OP_THREADS="${INTRA}"
-        unset MLCOUPLING_INTER_OP_THREADS
-        PHYDLL_DL_CLIENT="${BASE_DIR}/CPP-ML-Interface/dl_clients/build/phydll_dl_client"
-        export PHYDLL_DL_COUNT=${NP_DL}
+        export MLCOUPLING_INTER_OP_THREADS=1
+        export PHYDLL_DL_COUNT=1
+        export PHYDLL_DL_FIELD_COUNT=1
         timeout "${PHYDLL_TIMEOUT}" mpirun --oversubscribe --bind-to none \
-            -x LD_LIBRARY_PATH -n ${NP_SOLVER} "${SOLVER_BIN}" \
-            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
-            : -x LD_LIBRARY_PATH -n ${NP_DL} "${PHYDLL_DL_CLIENT}" \
+            -x LD_LIBRARY_PATH -x PHYDLL_DL_COUNT -x PHYDLL_DL_FIELD_COUNT \
+            -x MLCOUPLING_INTRA_OP_THREADS -x MLCOUPLING_INTER_OP_THREADS \
+            -n ${NP_SOLVER} "${SOLVER_BIN}" \
+            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$PHYDLL_INPUTS" \
+            : -x LD_LIBRARY_PATH -x PHYDLL_DL_COUNT -x PHYDLL_DL_FIELD_COUNT \
+            -x MLCOUPLING_INTRA_OP_THREADS -x MLCOUPLING_INTER_OP_THREADS \
+            -n ${NP_DL} "${PHYDLL_DL_CLIENT}" \
             > "$OUTPUT_FILE" 2>&1
         RC=$?
 
     elif [[ "$PNAME" == PHYDLL_PY_* ]]; then
         export MLCOUPLING_INTRA_OP_THREADS="${INTRA}"
-        unset MLCOUPLING_INTER_OP_THREADS
-        export PHYDLL_DL_COUNT=${NP_DL}
+        export MLCOUPLING_INTER_OP_THREADS=1
+        export PHYDLL_DL_COUNT=1
+        export PHYDLL_DL_FIELD_COUNT=1
         timeout "${PHYDLL_TIMEOUT}" mpirun --oversubscribe --bind-to none \
-            -x LD_LIBRARY_PATH -n ${NP_SOLVER} "${SOLVER_BIN}" \
-            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$INPUTS" \
-            : -x LD_LIBRARY_PATH -n ${NP_DL} "${SMARTSIM_PYTHON}" "${BASE_DIR}/CPP-ML-Interface/dl_clients/phydll_dl_client.py" \
+            -x LD_LIBRARY_PATH -x PHYDLL_DL_COUNT -x PHYDLL_DL_FIELD_COUNT \
+            -x MLCOUPLING_INTRA_OP_THREADS -x MLCOUPLING_INTER_OP_THREADS \
+            -n ${NP_SOLVER} "${SOLVER_BIN}" \
+            --provider PHYDLL --model "$MODEL_PATH" --schema "$SCHEMA" --inputs "$PHYDLL_INPUTS" \
+            : -x LD_LIBRARY_PATH -x PHYDLL_DL_COUNT -x PHYDLL_DL_FIELD_COUNT \
+            -x MLCOUPLING_INTRA_OP_THREADS -x MLCOUPLING_INTER_OP_THREADS \
+            -n ${NP_DL} "${SMARTSIM_PYTHON}" "${BASE_DIR}/CPP-ML-Interface/dl_clients/phydll_dl_client.py" \
             > "$OUTPUT_FILE" 2>&1
         RC=$?
     fi

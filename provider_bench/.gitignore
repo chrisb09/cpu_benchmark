@@ -1,4 +1,5 @@
 build/
+build-provider-bench/
 logs/
 .ssdb_endpoint*
 .solver_done*

@@ -4,6 +4,7 @@ project(provider_bench LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(PROVIDER_BENCH_WITH_AIX "Build provider_bench with AIxelerator support" ON)
+option(PROVIDER_BENCH_WITH_SCOREP "Build provider_bench with Score-P instrumentation" OFF)
 
 set(CPP_MODULE_DIR "/hpcwork/ro092286/smartsim/CPP-ML-Interface")
 set(SMARTREDIS_DIR "${CPP_MODULE_DIR}/extern/SmartRedis")
@@ -48,6 +49,7 @@ add_dependencies(benchmark_solver benchmark_registry)
 set(CPPML_DISABLE_REGISTRY_GEN ON CACHE BOOL "Disable CPP-ML-Interface registry generation" FORCE)
 set(WITH_PHYDLL ON CACHE BOOL "Enable PhyDLL provider support through CPP-ML-Interface" FORCE)
 set(WITH_AIX ${PROVIDER_BENCH_WITH_AIX} CACHE BOOL "Enable AIxelerator support through CPP-ML-Interface" FORCE)
+set(WITH_SCOREP ${PROVIDER_BENCH_WITH_SCOREP} CACHE BOOL "Enable Score-P manual instrumentation" FORCE)
 
 add_subdirectory("${CPP_MODULE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/cpp-ml-interface-build" EXCLUDE_FROM_ALL)
 
