@@ -60,7 +60,13 @@ MODELS=(
     "watercnn|10000000|mini_app|${BASE_DIR}/mini_app/train_models/model_a/watercnn_cpu.pt"
 )
 
+MODELS_FILTER="${PHYDLL_MODELS_FILTER:-}"
+
 for m_data in "${MODELS[@]}"; do
+    if [ -n "${MODELS_FILTER}" ]; then
+        MODEL_NAME_PEEK=$(echo "$m_data" | cut -d'|' -f1)
+        [[ ",${MODELS_FILTER}," == *",${MODEL_NAME_PEEK},"* ]] || continue
+    fi
     MODEL_NAME=$(echo "$m_data" | cut -d'|' -f1)
     INPUTS=$(echo "$m_data" | cut -d'|' -f2)
     SCHEMA=$(echo "$m_data" | cut -d'|' -f3)

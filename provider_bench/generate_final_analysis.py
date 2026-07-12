@@ -7,7 +7,7 @@ notebook = {
             "metadata": {},
             "source": [
                 "# Final C23MM Benchmark Analysis\n",
-                "This notebook aggregates and analyzes the 17 distinct provider/configuration benchmarks, each containing 50 inferences (5 models * 10 consecutive runs).\n"
+                "This notebook aggregates and analyzes all tracked provider/configuration benchmarks, each containing 50 inferences (5 models * 10 consecutive runs).\n"
             ]
         },
         {
@@ -50,6 +50,16 @@ notebook = {
                 "\n",
                 "df['bind_type'] = df.apply(determine_bind, axis=1)\n",
                 "\n",
+                "def determine_plot_group(row):\n",
+                "    provider = str(row['provider'])\n",
+                "    if provider.startswith('PHYDLL_CPP'):\n",
+                "        return 'PHYDLL C++'\n",
+                "    if provider.startswith('PHYDLL_PY'):\n",
+                "        return 'PHYDLL Python'\n",
+                "    return row['bind_type']\n",
+                "\n",
+                "df['plot_group'] = df.apply(determine_plot_group, axis=1)\n",
+                "\n",
                 "# Success rates\n",
                 "df['is_success'] = df['status'] == 'SUCCESS'\n",
                 "success_summary = df.groupby(['model', 'provider']).agg(\n",
@@ -78,7 +88,15 @@ notebook = {
                 "df_success = df[df['status'] == 'SUCCESS'].copy()\n",
                 "\n",
                 "models = sorted(df_success['model'].unique())\n",
-                "palette = {\"BIND\": \"#4C72B0\", \"NOBIND\": \"#C44E52\", \"OTHER\": \"#55A868\", \"SINGLE\": \"#FF9F00\"}\n",
+                "# Keep PhyDLL clients visually distinct from generic provider configurations.\n",
+                "palette = {\n",
+                "    \"BIND\": \"#4C72B0\",\n",
+                "    \"NOBIND\": \"#C44E52\",\n",
+                "    \"OTHER\": \"#55A868\",\n",
+                "    \"SINGLE\": \"#FF9F00\",\n",
+                "    \"PHYDLL C++\": \"#8172B2\",\n",
+                "    \"PHYDLL Python\": \"#CC79A7\",\n",
+                "}\n",
                 "\n",
                 "# Sort providers logically so they are consistent across plots\n",
                 "def get_provider_order(df_s):\n",
@@ -89,7 +107,7 @@ notebook = {
                 "    order = get_provider_order(data_m)\n",
                 "    \n",
                 "    plt.figure(figsize=(16, 8))\n",
-                "    ax = sns.barplot(data=data_m, x='provider', y='time_s', hue='bind_type', \n",
+                "    ax = sns.barplot(data=data_m, x='provider', y='time_s', hue='plot_group', \n",
                 "                     palette=palette, estimator=np.median, order=order, dodge=False, errorbar=None)\n",
                 "    \n",
                 "    # Add value labels on top of the bars\n",
@@ -100,7 +118,7 @@ notebook = {
                 "    plt.ylabel(\"Median Time (s)\", fontsize=14)\n",
                 "    plt.xlabel(\"Provider / Configuration\", fontsize=14)\n",
                 "    plt.xticks(rotation=45, ha='right', fontsize=12)\n",
-                "    plt.legend(title=\"Binding Type\")\n",
+                "    plt.legend(title=\"Provider Group\")\n",
                 "    plt.tight_layout()\n",
                 "    plt.show()\n"
             ]
@@ -126,14 +144,14 @@ notebook = {
                 "    \n",
                 "    plt.figure(figsize=(16, 8))\n",
                 "    # whis=(2.5, 97.5) visualizes the 95% empirical confidence interval limits directly on the whiskers\n",
-                "    sns.boxplot(data=data_m, x='provider', y='time_s', hue='bind_type', \n",
+                "    sns.boxplot(data=data_m, x='provider', y='time_s', hue='plot_group', \n",
                 "                palette=palette, order=order, dodge=False, whis=(2.5, 97.5), fliersize=6, flierprops=dict(marker='d'))\n",
                 "    \n",
                 "    plt.title(f\"Execution Time 95% CI (10 Runs) for Model: {model}\", fontsize=18)\n",
                 "    plt.ylabel(\"Time (s)\", fontsize=14)\n",
                 "    plt.xlabel(\"Provider / Configuration\", fontsize=14)\n",
                 "    plt.xticks(rotation=45, ha='right', fontsize=12)\n",
-                "    plt.legend(title=\"Binding Type\")\n",
+                "    plt.legend(title=\"Provider Group\")\n",
                 "    plt.tight_layout()\n",
                 "    plt.show()\n"
             ]
@@ -157,7 +175,7 @@ notebook = {
                 "    order = get_provider_order(data_m)\n",
                 "    \n",
                 "    plt.figure(figsize=(16, 8))\n",
-                "    ax = sns.barplot(data=data_m, x='provider', y='max_rss_mb', hue='bind_type', \n",
+                "    ax = sns.barplot(data=data_m, x='provider', y='max_rss_mb', hue='plot_group', \n",
                 "                     palette=palette, estimator=np.median, order=order, dodge=False, errorbar=None)\n",
                 "    \n",
                 "    # Add value labels on top of the bars\n",
@@ -168,7 +186,7 @@ notebook = {
                 "    plt.ylabel(\"Memory (MB)\", fontsize=14)\n",
                 "    plt.xlabel(\"Provider / Configuration\", fontsize=14)\n",
                 "    plt.xticks(rotation=45, ha='right', fontsize=12)\n",
-                "    plt.legend(title=\"Binding Type\")\n",
+                "    plt.legend(title=\"Provider Group\")\n",
                 "    plt.tight_layout()\n",
                 "    plt.show()\n"
             ]
@@ -192,14 +210,14 @@ notebook = {
                 "    order = get_provider_order(data_m)\n",
                 "    \n",
                 "    plt.figure(figsize=(16, 8))\n",
-                "    sns.boxplot(data=data_m, x='provider', y='max_rss_mb', hue='bind_type', \n",
+                "    sns.boxplot(data=data_m, x='provider', y='max_rss_mb', hue='plot_group', \n",
                 "                palette=palette, order=order, dodge=False, whis=(2.5, 97.5), fliersize=6, flierprops=dict(marker='d'))\n",
                 "    \n",
                 "    plt.title(f\"Memory Max RSS 95% CI (10 Runs) for Model: {model}\", fontsize=18)\n",
                 "    plt.ylabel(\"Memory (MB)\", fontsize=14)\n",
                 "    plt.xlabel(\"Provider / Configuration\", fontsize=14)\n",
                 "    plt.xticks(rotation=45, ha='right', fontsize=12)\n",
-                "    plt.legend(title=\"Binding Type\")\n",
+                "    plt.legend(title=\"Provider Group\")\n",
                 "    plt.tight_layout()\n",
                 "    plt.show()\n"
             ]

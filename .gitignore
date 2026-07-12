@@ -4,3 +4,4 @@ logs/
 .ssdb_endpoint*
 .solver_done*
 *.csv
+core.*
