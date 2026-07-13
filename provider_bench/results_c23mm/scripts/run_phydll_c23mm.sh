@@ -38,6 +38,21 @@ export MLCOUPLING_INTER_OP_THREADS=1
 export PHYDLL_DL_COUNT=1
 export PHYDLL_DL_FIELD_COUNT=1
 
+get_job_cgroup_mem() {
+    local uid="${SLURM_UID:-$(id -u)}"
+    local jobid="${SLURM_JOB_ID:-}"
+    if [ -n "${jobid}" ]; then
+        local cg_path="/sys/fs/cgroup/memory/slurm/uid_${uid}/job_${jobid}/memory.max_usage_in_bytes"
+        if [ -f "${cg_path}" ]; then
+            local bytes
+            bytes=$(cat "${cg_path}")
+            echo "$(( bytes / 1024 / 1024 ))"
+            return
+        fi
+    fi
+    echo "-1"
+}
+
 if [ ! -x "${SOLVER_BIN}" ] || [ ! -x "${DL_CLIENT_CPP}" ]; then
     echo "Provider-bench binaries are missing." >&2
     echo "Run ${BENCH_DIR}/build.sh before submitting this benchmark." >&2
@@ -45,7 +60,7 @@ if [ ! -x "${SOLVER_BIN}" ] || [ ! -x "${DL_CLIENT_CPP}" ]; then
 fi
 
 if [ ! -f "${RESULTS_CSV}" ] || ! grep -q '^label,' "${RESULTS_CSV}"; then
-    echo "label,model,provider,tpq,intra_threads,bind_cores,time_s,max_rss_mb,status" > "${RESULTS_CSV}"
+    echo "label,model,provider,tpq,intra_threads,bind_cores,cold_time_s,warm_time_s,max_rss_mb,job_mem_mb,status" > "${RESULTS_CSV}"
 fi
 
 if grep -q ',RUNNING$' "${RESULTS_CSV}" 2>/dev/null; then
@@ -72,7 +87,7 @@ for m_data in "${MODELS[@]}"; do
     SCHEMA=$(echo "$m_data" | cut -d'|' -f3)
     MODEL_PATH=$(echo "$m_data" | cut -d'|' -f4)
 
-    successful_runs=$(awk -F, -v m="$MODEL_NAME" -v p="$PNAME" 'NR>1 && $2==m && $3==p && $9=="SUCCESS" {c++} END {print c+0}' "${RESULTS_CSV}")
+    successful_runs=$(awk -F, -v m="$MODEL_NAME" -v p="$PNAME" 'NR>1 && $2==m && $3==p && $11=="SUCCESS" {c++} END {print c+0}' "${RESULTS_CSV}")
     attempted_runs=$(awk -F, -v m="$MODEL_NAME" -v p="$PNAME" 'NR>1 && $2==m && $3==p {c++} END {print c+0}' "${RESULTS_CSV}")
     if [ "${successful_runs}" -ge "${REQUIRED_SUCCESSFUL_RUNS}" ]; then
         echo "Skipping ${MODEL_NAME} for ${PNAME}: already have ${successful_runs} successful runs"
@@ -90,7 +105,7 @@ for m_data in "${MODELS[@]}"; do
         fi
         LABEL="${MODEL_NAME}_${PNAME}"
         OUTPUT_FILE="${LOGS_DIR}/${MODEL_NAME}_${PNAME}_run${run}.log"
-        RUN_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,-1,-1,RUNNING"
+        RUN_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,-1,-1,-1,-1,RUNNING"
         echo "${RUN_ROW}" >> "${RESULTS_CSV}"
         LINE_NUM=$(wc -l < "${RESULTS_CSV}")
 
@@ -126,17 +141,19 @@ for m_data in "${MODELS[@]}"; do
         if [ ${RC} -eq 0 ]; then
             RES_LINE=$(grep '^RESULT:' "${OUTPUT_FILE}" | tail -n 1 | cut -d':' -f2)
             if [ -n "${RES_LINE}" ]; then
-                T_S=$(echo "${RES_LINE}" | cut -d',' -f1)
-                M_MB=$(echo "${RES_LINE}" | cut -d',' -f2)
-                FINAL_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,${T_S},${M_MB},SUCCESS"
-                echo "  -> SUCCESS: ${T_S}s | ${M_MB}MB"
+                T_COLD=$(echo "${RES_LINE}" | cut -d',' -f1)
+                T_WARM=$(echo "${RES_LINE}" | cut -d',' -f2)
+                M_RSS=$(echo "${RES_LINE}" | cut -d',' -f3)
+                M_JOB=$(get_job_cgroup_mem)
+                FINAL_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,${T_COLD},${T_WARM},${M_RSS},${M_JOB},SUCCESS"
+                echo "  -> SUCCESS: cold=${T_COLD}s, warm=${T_WARM}s | solver_rss=${M_RSS}MB, job_mem=${M_JOB}MB"
                 RUN_SUCCEEDED=1
             else
-                FINAL_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,-1,-1,FAILED_PARSE"
+                FINAL_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,-1,-1,-1,-1,FAILED_PARSE"
                 echo "  -> FAILED: could not parse RESULT line"
             fi
         else
-            FINAL_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,-1,-1,FAILED_RC_${RC}"
+            FINAL_ROW="${LABEL},${MODEL_NAME},${PNAME},96,1,0,-1,-1,-1,-1,FAILED_RC_${RC}"
             echo "  -> FAILED with RC ${RC}"
         fi
 

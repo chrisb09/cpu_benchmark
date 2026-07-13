@@ -137,8 +137,10 @@ int main(int argc, char** argv) {
         std::cout << std::endl;
     }
 
-    double local_elapsed = 0.0;
-    double max_elapsed = 0.0;
+    double local_cold_elapsed = 0.0;
+    double local_warm_elapsed = 0.0;
+    double max_cold_elapsed = 0.0;
+    double max_warm_elapsed = 0.0;
     double mem_mb = 0.0;
     double sum_mem = 0.0;
 
@@ -150,25 +152,29 @@ int main(int argc, char** argv) {
         MLCoupling<float, float> coupling(prov, app, beh, CouplingType::STATIC, &(app->input_data_after_preprocessing), &(app->output_data_before_postprocessing));
 
         MPI_Barrier(solver_comm);
-        auto start = std::chrono::high_resolution_clock::now();
 
         try {
-            if (world_rank == 0) std::cout << "Starting inference loop for " << num_batches << " batches..." << std::endl;
-            for (int b = 0; b < num_batches; ++b) {
-                if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 starting..." << std::endl;
-
-                if (world_rank == 0 || world_rank == world_size - 1 || world_rank == 33) {
-                    std::cout << "Rank " << world_rank << " before inference, shape=";
-                    for (auto d : input_data[0].dimensions()) std::cout << d << " ";
-                    std::cout << std::endl;
-                }
-
-                coupling.ordered()
-                    .set(input_data)
-                    .inference()
-                    .get(output_data);
-                if (world_rank == 0 && b == 0) std::cout << "  -> Batch 0 complete!" << std::endl;
-            }
+            if (world_rank == 0) std::cout << "Starting cold inference (iteration 0)..." << std::endl;
+            
+            auto start_cold = std::chrono::high_resolution_clock::now();
+            coupling.ordered()
+                .set(input_data)
+                .inference()
+                .get(output_data);
+            auto end_cold = std::chrono::high_resolution_clock::now();
+            local_cold_elapsed = std::chrono::duration<double>(end_cold - start_cold).count();
+            
+            if (world_rank == 0) std::cout << "Starting warm inference (iteration 1)..." << std::endl;
+            
+            auto start_warm = std::chrono::high_resolution_clock::now();
+            coupling.ordered()
+                .set(input_data)
+                .inference()
+                .get(output_data);
+            auto end_warm = std::chrono::high_resolution_clock::now();
+            local_warm_elapsed = std::chrono::duration<double>(end_warm - start_warm).count();
+            
+            if (world_rank == 0) std::cout << "Inference iterations complete!" << std::endl;
         } catch(const std::exception& e) {
             std::cerr << "Rank " << world_rank << " Exception: " << e.what() << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -176,19 +182,18 @@ int main(int argc, char** argv) {
         }
 
         MPI_Barrier(solver_comm);
-        auto end = std::chrono::high_resolution_clock::now();
-        local_elapsed = std::chrono::duration<double>(end - start).count();
-
         struct rusage r_usage;
         getrusage(RUSAGE_SELF, &r_usage);
         mem_mb = r_usage.ru_maxrss / 1024.0;
+        
+        MPI_Reduce(&local_cold_elapsed, &max_cold_elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, solver_comm);
+        MPI_Reduce(&local_warm_elapsed, &max_warm_elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, solver_comm);
     }
     
-    MPI_Reduce(&local_elapsed, &max_elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, solver_comm);
     MPI_Reduce(&mem_mb, &sum_mem, 1, MPI_DOUBLE, MPI_SUM, 0, solver_comm);
 
     if (world_rank == 0) {
-        std::cout << "RESULT:" << max_elapsed << "," << sum_mem << std::endl;
+        std::cout << "RESULT:" << max_cold_elapsed << "," << max_warm_elapsed << "," << sum_mem << std::endl;
     }
 
     MPI_Finalize();
