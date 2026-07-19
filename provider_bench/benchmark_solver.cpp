@@ -166,6 +166,8 @@ int main(int argc, char** argv) {
             
             if (world_rank == 0) std::cout << "Starting warm inference (iteration 1)..." << std::endl;
             
+            MPI_Barrier(solver_comm);
+            
             auto start_warm = std::chrono::high_resolution_clock::now();
             coupling.ordered()
                 .set(input_data)
