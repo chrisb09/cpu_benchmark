@@ -23,3 +23,6 @@ results_c23mm/.solver_done*
 !results_c23mm/*.csv
 results_c23mm/smartsim_experiments*
 results_c23ml/smartsim_experiments*
+results_devel/smartsim_experiments*
+results_devel/logs/
+results_devel/state/
