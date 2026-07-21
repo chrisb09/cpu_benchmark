@@ -21,6 +21,7 @@ results_c23mm/scripts/*
 results_c23mm/.ssdb_endpoint*
 results_c23mm/.solver_done*
 !results_c23mm/*.csv
+!results_devel/*.csv
 results_c23mm/smartsim_experiments*
 results_c23ml/smartsim_experiments*
 results_devel/smartsim_experiments*
