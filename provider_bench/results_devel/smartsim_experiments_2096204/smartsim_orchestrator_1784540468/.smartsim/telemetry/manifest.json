@@ -1,0 +1,50 @@
+{
+  "schema info": {
+    "schema_name": "entity manifest",
+    "version": "0.0.4"
+  },
+  "experiment": {
+    "name": "smartsim_orchestrator_1784540468",
+    "path": "/hpcwork/ro092286/smartsim/cpu_benchmark/provider_bench/results_devel/smartsim_experiments_2096204/smartsim_orchestrator_1784540468",
+    "launcher": "Slurm",
+    "out_file": "/hpcwork/ro092286/smartsim/cpu_benchmark/provider_bench/results_devel/smartsim_experiments_2096204/smartsim_orchestrator_1784540468/.smartsim/telemetry/logs/smartsim.out",
+    "err_file": "/hpcwork/ro092286/smartsim/cpu_benchmark/provider_bench/results_devel/smartsim_experiments_2096204/smartsim_orchestrator_1784540468/.smartsim/telemetry/logs/smartsim.err"
+  },
+  "runs": [
+    {
+      "run_id": "e97f3a9",
+      "timestamp": 1784540481599552249,
+      "model": [],
+      "orchestrator": [
+        {
+          "name": "orchestrator",
+          "type": "redis",
+          "interface": [
+            "lo"
+          ],
+          "shards": [
+            {
+              "name": "orchestrator_0",
+              "hostname": "127.0.0.1",
+              "port": 6780,
+              "cluster": false,
+              "conf_file": null,
+              "out_file": "/hpcwork/ro092286/smartsim/cpu_benchmark/provider_bench/results_devel/smartsim_experiments_2096204/smartsim_orchestrator_1784540468/.smartsim/telemetry/smartsim_orchestrator_1784540468/e97f3a9/database/orchestrator/orchestrator_0/orchestrator_0.out",
+              "err_file": "/hpcwork/ro092286/smartsim/cpu_benchmark/provider_bench/results_devel/smartsim_experiments_2096204/smartsim_orchestrator_1784540468/.smartsim/telemetry/smartsim_orchestrator_1784540468/e97f3a9/database/orchestrator/orchestrator_0/orchestrator_0.err",
+              "memory_file": "",
+              "client_file": "",
+              "client_count_file": "",
+              "telemetry_metadata": {
+                "status_dir": "/hpcwork/ro092286/smartsim/cpu_benchmark/provider_bench/results_devel/smartsim_experiments_2096204/smartsim_orchestrator_1784540468/.smartsim/telemetry/smartsim_orchestrator_1784540468/e97f3a9/database/orchestrator/orchestrator_0",
+                "step_id": "2096204.0",
+                "task_id": "161859",
+                "managed": true
+              }
+            }
+          ]
+        }
+      ],
+      "ensemble": []
+    }
+  ]
+}

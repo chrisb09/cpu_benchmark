@@ -1,4 +1,0 @@
-label,model,provider,tpq,intra_threads,bind_cores,cold_time_s,warm_time_s,max_rss_mb,job_mem_mb,status
-watercnn_SS_TPQ1_I96_B96_BATCH100,watercnn,SS_TPQ1_I96_B96_BATCH100,1,96,96,2.56381,2.48842,32377.2,243712,SUCCESS
-transformer_SS_TPQ1_I96_B96_BATCH100,transformer,SS_TPQ1_I96_B96_BATCH100,1,96,96,14.492,14.5969,29706.4,243712,SUCCESS
-mmcp_transformer_SS_TPQ1_I96_B96_BATCH100,mmcp_transformer,SS_TPQ1_I96_B96_BATCH100,1,96,96,46.0591,46.0258,34865.8,243712,SUCCESS
