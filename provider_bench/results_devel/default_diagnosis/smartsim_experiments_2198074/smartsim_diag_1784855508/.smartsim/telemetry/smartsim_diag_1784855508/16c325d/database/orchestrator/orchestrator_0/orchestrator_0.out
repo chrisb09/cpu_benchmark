@@ -1,0 +1,48 @@
+----------- Running Command ----------
+COMMAND: /rwthfs/rz/cluster/home/thes2181/python/smartsim_cpu/lib/python3.9/site-packages/smartsim/_core/bin/redis-server /rwthfs/rz/cluster/home/thes2181/python/smartsim_cpu/lib/python3.9/site-packages/smartsim/_core/config/redis.conf --loadmodule /rwthfs/rz/cluster/home/thes2181/python/smartsim_cpu/lib/python3.9/site-packages/smartsim/_core/lib/redisai.so THREADS_PER_QUEUE 96 INTER_OP_PARALLELISM 1 INTRA_OP_PARALLELISM 1 --port 6780 --bind 127.0.0.1 --bind-source-addr 127.0.0.1
+IPADDRESS: 127.0.0.1
+NETWORK: lo
+SMARTSIM_ORC_SHARD_INFO: {"name": "orchestrator_0", "hostname": "127.0.0.1", "port": 6780, "cluster": false}
+--------------------------------------
+
+--------------- Output ---------------
+
+
+37212:C 24 Jul 2026 03:11:49.392 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+37212:C 24 Jul 2026 03:11:49.392 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+37212:C 24 Jul 2026 03:11:49.392 * Redis version=7.2.4, bits=64, commit=d2c8a4b9, modified=0, pid=37212, just started
+37212:C 24 Jul 2026 03:11:49.392 * Configuration loaded
+37212:M 24 Jul 2026 03:11:49.392 * monotonic clock: POSIX clock_gettime
+37212:M 24 Jul 2026 03:11:49.393 # Failed to write PID file: Permission denied
+                _._
+           _.-``__ ''-._
+      _.-``    `.  `_.  ''-._           Redis 7.2.4 (d2c8a4b9/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._
+ (    '      ,       .-`  | `,    )     Running in standalone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6780
+ |    `-._   `._    /     _.-'    |     PID: 37212
+  `-._    `-._  `-./  _.-'    _.-'
+ |`-._`-._    `-.__.-'    _.-'_.-'|
+ |    `-._`-._        _.-'_.-'    |           https://redis.io
+  `-._    `-._`-.__.-'_.-'    _.-'
+ |`-._`-._    `-.__.-'    _.-'_.-'|
+ |    `-._`-._        _.-'_.-'    |
+  `-._    `-._`-.__.-'_.-'    _.-'
+      `-._    `-.__.-'    _.-'
+          `-._        _.-'
+              `-.__.-'
+
+37212:M 24 Jul 2026 03:11:49.393 * <ai> Redis version found by RedisAI: 7.2.4 - oss
+37212:M 24 Jul 2026 03:11:49.393 * <ai> RedisAI version 10207, git_sha=unknown
+37212:M 24 Jul 2026 03:11:49.393 * <ai> Setting THREADS_PER_QUEUE parameter to: 96
+37212:M 24 Jul 2026 03:11:49.393 * <ai> Setting INTER_OP_PARALLELISM parameter to: 1
+37212:M 24 Jul 2026 03:11:49.393 * <ai> Setting INTRA_OP_PARALLELISM parameter to: 1
+37212:M 24 Jul 2026 03:11:49.396 * Module 'ai' loaded from /rwthfs/rz/cluster/home/thes2181/python/smartsim_cpu/lib/python3.9/site-packages/smartsim/_core/lib/redisai.so
+37212:M 24 Jul 2026 03:11:49.396 * Server initialized
+37212:M 24 Jul 2026 03:11:49.396 * Ready to accept connections tcp
+37212:M 24 Jul 2026 03:12:06.139 # <ai> backend TORCH not loaded, will try loading default backend
+37212:M 24 Jul 2026 03:12:06.639 * <ai> TORCH backend loaded from /rwthfs/rz/cluster/home/thes2181/python/smartsim_cpu/lib/python3.9/site-packages/smartsim/_core/lib/backends/redisai_torch/redisai_torch.so
+37212:M 24 Jul 2026 03:12:28.001 * User requested shutdown...
+37212:M 24 Jul 2026 03:12:28.001 * <ai> Clearing resources on shutdown
+37212:M 24 Jul 2026 03:12:28.001 * Removing the pid file.
+37212:M 24 Jul 2026 03:12:28.001 # Redis is now ready to exit, bye bye...
