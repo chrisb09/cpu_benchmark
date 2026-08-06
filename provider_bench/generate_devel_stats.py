@@ -20,9 +20,20 @@ def calculate_stats(values, prefix):
     whis_upper = q75 + 1.5 * iqr
     
     std = np.std(values, ddof=1) if n > 1 else 0.0
-    ci_margin = 1.96 * (std / np.sqrt(n)) if n > 0 else 0.0
-    ci_lower = mean - ci_margin
-    ci_upper = mean + ci_margin
+    
+    # 95% Confidence Interval for Mean (1.96 * SE)
+    ci95_margin = 1.96 * (std / np.sqrt(n)) if n > 0 else 0.0
+    ci95_lower = mean - ci95_margin
+    ci95_upper = mean + ci95_margin
+
+    # 3-Sigma Confidence Interval for Mean (3.0 * SE)
+    ci3sigma_margin = 3.0 * (std / np.sqrt(n)) if n > 0 else 0.0
+    ci3sigma_lower = mean - ci3sigma_margin
+    ci3sigma_upper = mean + ci3sigma_margin
+
+    # 3-Sigma Sample Distribution Band (mean +/- 3*std)
+    sample_3sigma_lower = mean - 3.0 * std
+    sample_3sigma_upper = mean + 3.0 * std
     
     return {
         f"{prefix}_mean": mean,
@@ -32,8 +43,12 @@ def calculate_stats(values, prefix):
         f"{prefix}_p25": q25,
         f"{prefix}_p75": q75,
         f"{prefix}_std_dev": std,
-        f"{prefix}_ci_lower": ci_lower,
-        f"{prefix}_ci_upper": ci_upper,
+        f"{prefix}_ci_lower": ci95_lower,
+        f"{prefix}_ci_upper": ci95_upper,
+        f"{prefix}_ci3sigma_lower": ci3sigma_lower,
+        f"{prefix}_ci3sigma_upper": ci3sigma_upper,
+        f"{prefix}_3sigma_lower": sample_3sigma_lower,
+        f"{prefix}_3sigma_upper": sample_3sigma_upper,
         f"{prefix}_whisker_lower": whis_lower,
         f"{prefix}_whisker_upper": whis_upper
     }
