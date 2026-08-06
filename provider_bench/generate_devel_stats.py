@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pandas as pd
 import numpy as np
+from scipy import stats
 
 def calculate_stats(values, prefix):
     n = len(values)
@@ -20,14 +21,23 @@ def calculate_stats(values, prefix):
     whis_upper = q75 + 1.5 * iqr
     
     std = np.std(values, ddof=1) if n > 1 else 0.0
+    se = (std / np.sqrt(n)) if n > 0 else 0.0
     
-    # 95% Confidence Interval for Mean (1.96 * SE)
-    ci95_margin = 1.96 * (std / np.sqrt(n)) if n > 0 else 0.0
+    if n > 1:
+        # Student's t distribution critical values for df = n - 1
+        t_95 = stats.t.ppf(0.975, df=n-1)
+        t_3sig = stats.t.ppf(1.0 - (1.0 - 0.9973002039367398) / 2.0, df=n-1)
+    else:
+        t_95 = 0.0
+        t_3sig = 0.0
+
+    # 95% Student's t Confidence Interval for Mean
+    ci95_margin = t_95 * se
     ci95_lower = mean - ci95_margin
     ci95_upper = mean + ci95_margin
 
-    # 3-Sigma Confidence Interval for Mean (3.0 * SE)
-    ci3sigma_margin = 3.0 * (std / np.sqrt(n)) if n > 0 else 0.0
+    # 3-Sigma Student's t Confidence Interval for Mean
+    ci3sigma_margin = t_3sig * se
     ci3sigma_lower = mean - ci3sigma_margin
     ci3sigma_upper = mean + ci3sigma_margin
 
@@ -43,8 +53,8 @@ def calculate_stats(values, prefix):
         f"{prefix}_p25": q25,
         f"{prefix}_p75": q75,
         f"{prefix}_std_dev": std,
-        f"{prefix}_ci_lower": ci95_lower,
-        f"{prefix}_ci_upper": ci95_upper,
+        f"{prefix}_ci95_lower": ci95_lower,
+        f"{prefix}_ci95_upper": ci95_upper,
         f"{prefix}_ci3sigma_lower": ci3sigma_lower,
         f"{prefix}_ci3sigma_upper": ci3sigma_upper,
         f"{prefix}_3sigma_lower": sample_3sigma_lower,

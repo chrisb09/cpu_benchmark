@@ -3,6 +3,7 @@ import csv
 import statistics
 from collections import defaultdict
 from pathlib import Path
+from scipy import stats
 
 
 RESULTS = Path(__file__).with_name("diagnosis_sweep.csv")
@@ -71,12 +72,18 @@ def main():
                 whis_low = p25_v - 1.5 * iqr_v
                 whis_high = p75_v + 1.5 * iqr_v
                 
-                # CIs
+                # CIs using Student's t distribution
                 se_v = std_v / (n ** 0.5) if n > 0 else 0.0
-                ci95_low = mean_v - 1.96 * se_v
-                ci95_high = mean_v + 1.96 * se_v
-                ci3sig_low = mean_v - 3.0 * se_v
-                ci3sig_high = mean_v + 3.0 * se_v
+                if n > 1:
+                    t95 = stats.t.ppf(0.975, df=n-1)
+                    t3sig = stats.t.ppf(1.0 - (1.0 - 0.9973002039367398)/2.0, df=n-1)
+                else:
+                    t95 = t3sig = 0.0
+                    
+                ci95_low = mean_v - t95 * se_v
+                ci95_high = mean_v + t95 * se_v
+                ci3sig_low = mean_v - t3sig * se_v
+                ci3sig_high = mean_v + t3sig * se_v
                 sample_3sig_low = mean_v - 3.0 * std_v
                 sample_3sig_high = mean_v + 3.0 * std_v
             else:
