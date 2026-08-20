@@ -9,6 +9,7 @@
 #include <sys/resource.h>
 
 #include "ml_coupling.hpp"
+#include "library/ml_coupling_library.hpp"
 #ifdef WITH_AIX
 #include "provider/ml_coupling_provider_aixelerator.hpp"
 #endif
@@ -19,15 +20,18 @@
 #include "normalization/ml_coupling_minmax_normalization.hpp"
 
 // Dummy Application
-template <typename In, typename Out>
-class BenchmarkApplication : public MLCouplingApplication<In, Out> {
+template <typename CouplingInput,
+          typename CouplingOutput,
+          typename LibraryInput = CouplingInput,
+          typename LibraryOutput = CouplingOutput>
+class BenchmarkApplication : public MLCouplingApplication<CouplingInput, CouplingOutput, LibraryInput, LibraryOutput> {
 public:
-    BenchmarkApplication(MLCouplingData<In> input_data, MLCouplingData<Out> output_data)
-        : MLCouplingApplication<In, Out>(std::move(input_data), std::move(output_data), new MLCouplingMinMaxNormalization<In, Out>(0.0f, 1.0f, 0.0f, 1.0f)) {}
+    BenchmarkApplication(MLCouplingData<CouplingInput> input_data, MLCouplingData<CouplingOutput> output_data)
+        : MLCouplingApplication<CouplingInput, CouplingOutput, LibraryInput, LibraryOutput>(
+              std::move(input_data), std::move(output_data), new MLCouplingMinMaxNormalization<LibraryInput, CouplingOutput>(0.0f, 1.0f, 0.0f, 1.0f)) {}
 protected:
-    MLCouplingData<In> preprocess(MLCouplingData<In> input_data) override { return input_data; }
-    void coupling_step(MLCouplingData<In>) override {}
-    MLCouplingData<Out> postprocess(MLCouplingData<Out> output_data) override { return output_data; }
+    MLCouplingData<LibraryInput> preprocess_coupling_input(MLCouplingData<CouplingInput> input_data) override { return input_data; }
+    MLCouplingData<CouplingOutput> postprocess_library_output(MLCouplingData<LibraryOutput> output_data) override { return output_data; }
 };
 
 int main(int argc, char** argv) {
@@ -98,23 +102,23 @@ int main(int argc, char** argv) {
         MLCouplingTensor<float>::wrap_flat(out_buffer.data(), out_shape, MLCouplingMemLayoutContiguous, MLCouplingOwnershipExternal)
     }};
 
-    MLCouplingProvider<float, float>* prov = nullptr;
+    MLCouplingLibrary<float, float>* prov = nullptr;
     if (provider == "AIX") {
 #ifdef WITH_AIX
-        prov = new MLCouplingProviderAixelerator<float, float>(model_path, current_bs, solver_comm, false);
+        prov = new MLCouplingLibraryAixelerator<float, float>(model_path, current_bs, solver_comm, false);
 #else
         if (world_rank == 0) std::cerr << "AIX provider not compiled into this benchmark_solver build." << std::endl;
         MPI_Finalize();
         return 1;
 #endif
     } else if (provider == "PHYDLL") {
-        prov = new MLCouplingProviderPhydll<float, float>(model_path, "TORCH", "CPU");
+        prov = new MLCouplingLibraryPhydll<float, float>(model_path, "TORCH", "CPU");
     } else if (provider == "SMARTSIM") {
         std::string m_name = "benchmark_model";
         if (std::getenv("MLCOUPLING_MULTI_MODEL") != nullptr) {
             m_name += "_" + std::to_string(world_rank);
         }
-        prov = new MLCouplingProviderSmartsim<float, float>("CPU", "TORCH", model_path, m_name, "", -1, 1, 0, 0, batch_size, min_batch_size, min_batch_timeout, 2000, 2000, 2000000);
+        prov = new MLCouplingLibrarySmartsim<float, float>("CPU", "TORCH", model_path, m_name, "", -1, 1, 0, 0, batch_size, min_batch_size, min_batch_timeout, 2000, 2000, 2000000);
     } else {
         if (world_rank == 0) std::cerr << "Unknown provider: " << provider << std::endl;
         MPI_Finalize();
@@ -149,7 +153,7 @@ int main(int argc, char** argv) {
     {
         auto* app = new BenchmarkApplication<float, float>(input_data, output_data);
         auto* beh = new MLCouplingBehaviorDefault();
-        MLCoupling<float, float> coupling(prov, app, beh, CouplingType::STATIC, &(app->input_data_after_preprocessing), &(app->output_data_before_postprocessing));
+        MLCoupling<float, float> coupling(prov, app, beh, CouplingType::STATIC, &(app->library_input), &(app->library_output));
 
         MPI_Barrier(solver_comm);
 

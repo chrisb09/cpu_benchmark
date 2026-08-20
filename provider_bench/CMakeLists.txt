@@ -22,13 +22,14 @@ set(TEMP_GENERATED_REGISTRY "${CMAKE_CURRENT_BINARY_DIR}/generated_registry.tmp.
 file(GLOB_RECURSE CPP_MODULE_HEADERS
 	"${CPP_MODULE_DIR}/include/application/*.hpp"
 	"${CPP_MODULE_DIR}/include/behavior/*.hpp"
+	"${CPP_MODULE_DIR}/include/library/*.hpp"
 	"${CPP_MODULE_DIR}/include/normalization/*.hpp"
 	"${CPP_MODULE_DIR}/include/provider/*.hpp"
 )
 set(ALL_HEADERS ${CPP_MODULE_HEADERS})
 list(REMOVE_DUPLICATES ALL_HEADERS)
 
-set(BASE_CLASSES "MLCouplingProvider,MLCouplingNormalization,MLCouplingBehavior,MLCouplingApplication")
+set(BASE_CLASSES "MLCouplingLibrary,MLCouplingNormalization,MLCouplingBehavior,MLCouplingApplication")
 set(CLANG_ARGS "-std=c++17 -I${CPP_MODULE_DIR}/include -I${SMARTREDIS_DIR}/include -I${SMARTREDIS_DIR}/install/include -I${CPP_MODULE_DIR}/build/_deps/tomlplusplus-src/include -I${PHYDLL_BUILD_DIR}/include -xc++")
 
 add_custom_command(
