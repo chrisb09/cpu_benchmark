@@ -1,0 +1,10 @@
+[logging]
+level = "error"
+error_separate = false
+[library]
+class = "AIX"
+[behavior]
+class = "Default"
+[application]
+class = "MLCouplingApplicationTerrainSolver"
+model_io_layout = "flat_contiguous"

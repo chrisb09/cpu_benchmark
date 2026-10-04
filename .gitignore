@@ -5,3 +5,11 @@ logs/
 .solver_done*
 *.csv
 core.*
+readiness_build/
+readiness_results/
+forward_diag_build/
+forward_diag_results/
+readiness_figures/**/*.png
+readiness_figures/**/*.pdf
+readiness_figures/**/*.log
+readiness_figures/**/plot_metadata.json
