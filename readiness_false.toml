@@ -1,0 +1,14 @@
+[logging]
+level = "error"
+error_separate = false
+[library]
+class = "Phydll"
+backend = "TORCH"
+device = "CPU"
+batch_size = 10000000
+solver_readiness_wait = false
+[behavior]
+class = "Default"
+[application]
+class = "MLCouplingApplicationTerrainSolver"
+model_io_layout = "flat_contiguous"
