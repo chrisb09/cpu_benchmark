@@ -13,3 +13,9 @@ readiness_figures/**/*.png
 readiness_figures/**/*.pdf
 readiness_figures/**/*.log
 readiness_figures/**/plot_metadata.json
+
+# mmcp_benchmark large output directories
+mmcp_benchmark/results/
+mmcp_benchmark/scratch/
+scratch/
+__pycache__/
