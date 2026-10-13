@@ -81,6 +81,10 @@ class RetestTests(unittest.TestCase):
             srun.write_text(f"#!{sys.executable}\n" + '''import io, os, pathlib, tarfile
 args = __import__('sys').argv[1:]
 pathlib.Path('launch.args').write_text(' '.join(args))
+if os.environ['PROVIDER'] == 'SMARTSIM':
+    assert os.environ['SR_CMD_TIMEOUT'] == '3600'
+    assert os.environ['SR_SOCKET_TIMEOUT'] == '3600000'
+    assert os.environ['SR_MODEL_TIMEOUT'] == '3600000'
 count = int(os.environ['EXPECTED_INFERENCE_CALLS'])
 for i in range(count):
     print(f'ML_STEP_TIMING step={15 + 29*i} ml_ms=1 rank_min_ms=1 rank_max_ms=1')
@@ -119,9 +123,10 @@ if os.environ['MEASUREMENT'] == 'profile':
                     if provider == "SMARTSIM":
                         config = (run / "config_smartsim.toml").read_text()
                         self.assertIn("command_timeout = 3600", config)
-                        self.assertIn("socket_timeout = 3600", config)
+                        self.assertIn("socket_timeout = 3600000", config)
                         self.assertIn("model_timeout = 3600000", config)
                         self.assertIn("SS_MODEL_TIMEOUT_MS=3600000", (run / "run.info").read_text())
+                        self.assertIn("SS_SOCKET_TIMEOUT_MS=3600000", (run / "run.info").read_text())
                     if mode == "memory":
                         self.assertIn("MEMORY_VALID=false", (run / "run.info").read_text())
                     else:
@@ -145,6 +150,16 @@ if os.environ['MEASUREMENT'] == 'profile':
                 archive.addfile(member, io.BytesIO(xml))
             with self.assertRaisesRegex(ValueError, "MPI ranks"):
                 verify.verify(run)
+
+    def test_devel_diagnostic_plan(self):
+        script = HERE / "slurm/debug_transformer_smartsim.sbatch"
+        for config, counts in [("tpq96", [3, 7]), ("default", [1])]:
+            result = subprocess.run(["bash", str(script), config, "--plan"], text=True, capture_output=True, check=True)
+            rows = [dict(field.split("=", 1) for field in line.split()) for line in result.stdout.splitlines()]
+            self.assertEqual([int(row["calls"]) for row in rows], counts)
+            self.assertTrue(all(row["socket_ms"] == "3600000" for row in rows))
+            # Reserve controller readiness/cleanup overhead within the 1-hour allocation.
+            self.assertLess(sum(int(row["case_s"]) + 240 for row in rows), 3600)
 
 
 if __name__ == "__main__":

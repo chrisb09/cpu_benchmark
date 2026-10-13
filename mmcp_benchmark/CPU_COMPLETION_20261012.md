@@ -69,6 +69,10 @@ partition routing, filtered submission, mocked launches, and profile rejection.
 
 ## Transformer SmartSim Timeout Retries
 
+Correction: the socket-units claim in this historical submission section was
+wrong. SmartRedis socket limits are milliseconds, not seconds. See
+`SMARTSIM_TRANSFORMER_DEBUG.md` for the corrected values and diagnostic gates.
+
 Jobs 4940330, 4940331, and 4940334 failed on missing output tensors during
 the first inference after roughly 600 seconds. No OOM was recorded; the wait
 limit is the likely cause, not a confirmed RedisAI diagnosis. Engine defaults
@@ -108,3 +112,14 @@ the observed unreadable-counter nodes; it does not resolve their underlying
 cgroup layout/permissions. All failed original outputs remain preserved.
 Five contract tests passed, now exercising the startup-loading wrapper and
 explicit scheduler node exclusions. The engine was not edited during this fix.
+
+## Corrected Transformer Plain Timing Replacements
+
+After devel diagnostics 4962935/4962936 succeeded, submitted 4966829 (default),
+4966830 (TPQ1), 4966831 (TPQ12), and 4966832 (TPQ96). These replace failed
+4952700/4952702/4952707/4952709 respectively, with five-hour whole-case limits
+and six-hour allocations. Socket/model limits are 3600000 milliseconds and
+command limit 3600 seconds. See SMARTSIM_TRANSFORMER_DEBUG.md for diagnostic
+results and resources. Existing profile/memory retries are unchanged; the final
+seven missing cells now all have submitted jobs. Acceptance still requires
+successful runtime verification, numerical parity, and profile-metric analysis.

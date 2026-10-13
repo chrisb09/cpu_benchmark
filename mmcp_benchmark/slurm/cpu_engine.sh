@@ -181,7 +181,7 @@ elif [[ "${provider}" == SMARTSIM ]]; then
         -e "s/^min_batch_size *=.*/min_batch_size = 0/" \
         -e "s/^min_batch_timeout *=.*/min_batch_timeout = 0/" \
         -e "s/^command_timeout *=.*/command_timeout = ${ss_timeout_s}/" \
-        -e "s/^socket_timeout *=.*/socket_timeout = ${ss_timeout_s}/" \
+        -e "s/^socket_timeout *=.*/socket_timeout = ${ss_timeout_ms}/" \
         -e "s/^model_timeout *=.*/model_timeout = ${ss_timeout_ms}/" "${config_name}"
 fi
 
@@ -209,6 +209,8 @@ fi
         printf 'SS_CONFIG=%s\n' "${ss_config}"
         printf 'SS_DB_BATCH=%s\n' "${ss_db_batch}"
         printf 'SS_TIMEOUT_SECONDS=%s\n' "${ss_timeout_s}"
+        printf 'SS_COMMAND_TIMEOUT_SECONDS=%s\n' "${ss_timeout_s}"
+        printf 'SS_SOCKET_TIMEOUT_MS=%s\n' "${ss_timeout_ms}"
         printf 'SS_MODEL_TIMEOUT_MS=%s\n' "${ss_timeout_ms}"
     fi
     printf 'SLURM_CPUS_ON_NODE=%s\n' "${SLURM_CPUS_ON_NODE:-unknown}"
@@ -323,8 +325,8 @@ elif [[ "${provider}" == SMARTSIM ]]; then
     smart_env="${SMARTSIM_PYTHON_ENV:-/hpcwork/$(whoami)/smartsim/python/smartsim_cpu/bin/activate}"
     [[ -r "${smart_env}" ]] || { printf 'SmartSim environment missing: %s\n' "${smart_env}" >&2; exit 1; }
     source "${smart_env}"
-    # SmartRedis command/socket limits use seconds; CMI output polling uses ms.
-    export SR_CMD_TIMEOUT="${ss_timeout_s}" SR_SOCKET_TIMEOUT="${ss_timeout_s}" SR_MODEL_TIMEOUT="${ss_timeout_ms}"
+    # SmartRedis commands use seconds; socket replies and model limits use ms.
+    export SR_CMD_TIMEOUT="${ss_timeout_s}" SR_SOCKET_TIMEOUT="${ss_timeout_ms}" SR_MODEL_TIMEOUT="${ss_timeout_ms}"
     export SMARTSIM_MPI_SEQUENTIAL_PUT=0
     export SR_LOG_LEVEL=INFO SR_LOG_FILE="${run_dir}/smartredis.log"
 

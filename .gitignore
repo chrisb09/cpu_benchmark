@@ -19,3 +19,6 @@ mmcp_benchmark/results/
 mmcp_benchmark/scratch/
 scratch/
 __pycache__/
+
+# Shared local CPU figure exports and derived audit tables
+figures/cpu_final/

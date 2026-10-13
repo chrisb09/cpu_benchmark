@@ -81,8 +81,8 @@ Use `RETEST_WALLTIME` to override the five-hour allocation and
 Older SmartSim transformer logs include calls lasting over 900 seconds;
 the former 1800-second timeout was not sufficient for seven calls.
 SmartSim now defaults to a one-hour per-request/output wait via
-`SS_TIMEOUT_SECONDS=3600`. Command/socket limits are seconds; model/output
-polling uses milliseconds (3600000). The engine records both units in run.info.
+`SS_TIMEOUT_SECONDS=3600`. Command limits use seconds; socket replies and model
+limits use milliseconds (3600000). The engine records all units in run.info.
 This replaces the 600-second output wait that failed on the first Transformer
 inference. The overall case timeout and Slurm walltime remain independent limits.
 
