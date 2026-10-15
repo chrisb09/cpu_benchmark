@@ -58,6 +58,14 @@ maia_build_dir="${MAIA_BUILD_DIR:?Set MAIA_BUILD_DIR to the plain or Score-P bui
 maia_build_dir="$(realpath "${maia_build_dir}")"
 maia="${maia_build_dir}/bin/maia"
 [[ -x "${maia}" ]] || { printf 'MAIA not executable: %s\n' "${maia}" >&2; exit 1; }
+if [[ "${measurement}" == profile && "${PROFILE_SCOPE_VERSION:-}" == steady-v1 ]]; then
+    for marker in PROFILE_SCOPE_VERSION=steady-v1 PROFILE_SCOPE=cmi_inference_steady PROFILE_WARMUP_CALLS=2; do
+        grep -Fxq "${marker}" "${maia_build_dir}/BUILD_READY" || {
+            printf 'Steady profile build marker missing: %s\n' "${marker}" >&2; exit 1;
+        }
+    done
+    export CMI_SCOREP_WARMUP_CALLS=2
+fi
 
 source "${artifact_dir}/setup_env_claix23.sh"
 cuda_lib=/cvmfs/software.hpc.rwth.de/Linux/RH9/x86_64/intel/sapphirerapids/software/CUDA/12.4.0/targets/x86_64-linux/lib
@@ -192,6 +200,9 @@ fi
     printf 'MAIA=%s\n' "${maia}"
     printf 'PROVIDER=%s\n' "${provider}"
     printf 'MEASUREMENT=%s\n' "${measurement}"
+    if [[ "${measurement}" == profile && "${PROFILE_SCOPE_VERSION:-}" == steady-v1 ]]; then
+        printf 'PROFILE_SCOPE_VERSION=steady-v1\nPROFILE_SCOPE=cmi_inference_steady\nPROFILE_WARMUP_CALLS=2\nCMI_SCOREP_WARMUP_CALLS=2\n'
+    fi
     printf 'WARMUP_CALLS=2\nEXPECTED_INFERENCE_CALLS=%s\n' "${EXPECTED_INFERENCE_CALLS:-$(( (run_steps + 13) / 29 ))}"
     printf 'SCOREP_EXPERIMENT_DIRECTORY=%s\n' "${SCOREP_EXPERIMENT_DIRECTORY:-disabled}"
     printf 'MODEL=%s\n' "${model_path}"

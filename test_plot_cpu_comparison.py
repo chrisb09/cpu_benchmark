@@ -91,19 +91,20 @@ class SourceAndRenderingTests(unittest.TestCase):
         self.assertNotIn("mlp_ov0", plot.selected_models())
         self.assertIn("mlp_ov0", plot.selected_models(True))
 
-    def test_maia_ci_and_missing_phases(self):
+    def test_maia_ci_and_recorded_phases(self):
         rows = [r for r in self.latency if r["model"] not in plot.MODELS[:2]]
         self.assertTrue(all(r["ci_half_ms"] is None and r["independent_runs"] == 1 for r in rows))
-        missing = [r for r in self.phases if r["status"] == "unavailable_not_recorded"]
-        self.assertEqual(len(missing), 48)
-        self.assertTrue(all(r["mean_ms"] is None and r["ci_half_ms"] is None for r in missing))
+        # Two-warmup scope means every provider, SmartSim included, is recorded.
+        self.assertFalse([r for r in self.phases if r["status"] == "unavailable_not_recorded"])
+        maia = [r for r in self.phases if r["model"] in plot.MODELS[2:]]
+        self.assertTrue(maia and all(r["frames"] == plot.STEADY_CALLS for r in maia))
 
     def test_visit_counts_and_no_send_descendant(self):
-        self.assertTrue(all(r["visits_min"] == r["visits_max"] == r["denominator_frames"] for r in self.audit))
-        self.assertTrue(all(r["denominator_frames"] == (7 if r["variant"] == "AIX" else 6) for r in self.audit))
+        self.assertTrue(all(r["visits_min"] == r["visits_max"] == plot.STEADY_CALLS for r in self.audit))
+        self.assertTrue(all(r["denominator_frames"] == plot.STEADY_CALLS for r in self.audit))
         self.assertNotIn("dl_send", {r["region"] for r in self.audit})
-        self.assertTrue(all(r["visits_rankavg"] == (35 if r["region"] == "flowex_extract_cubes" else 7)
-                            and r["denominator_calls"] == 7 for r in self.pre))
+        self.assertTrue(all(r["visits_rankavg"] == plot.STEADY_CALLS
+                            and r["denominator_calls"] == plot.STEADY_CALLS for r in self.pre))
 
     def test_memory_is_maximum_without_ci(self):
         self.assertTrue(all(r["ci_status"] == "not_applicable_maximum" for r in self.memory))
@@ -137,7 +138,7 @@ class SourceAndRenderingTests(unittest.TestCase):
         manifest = json.loads((plot.OUTPUT / "manifest.json").read_text())
         self.assertGreaterEqual(len(manifest["figures"]), 14)
         self.assertEqual(manifest["main_models"], list(plot.MODELS))
-        self.assertEqual(manifest["phase_unavailable_rows"], 48)
+        self.assertEqual(manifest["phase_unavailable_rows"], 0)
         for record in manifest["figures"]:
             self.assertTrue((plot.OUTPUT / (record["name"] + ".png")).is_file())
             self.assertTrue((plot.OUTPUT / (record["name"] + ".pdf")).is_file())

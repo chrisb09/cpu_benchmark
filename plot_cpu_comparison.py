@@ -15,10 +15,13 @@ import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
-MAIA = ROOT / "mmcp_benchmark/results/cpu_final_20261013/maia"
+# Two-warmup steady-scope profile tables (calls 3-7) plus unchanged timing/memory.
+MAIA = ROOT / "mmcp_benchmark/results/cpu_final_steady_20261014/maia"
 TERRAIN = ROOT.parent / "mini_app/campaign_figures/terrain_cpu_complete_20261013"
 OUTPUT = ROOT / "figures/cpu_final"
 T95 = 2.776445
+# Two-warmup scope: inference calls 3-7 measured against a five-call denominator.
+STEADY_CALLS = 5
 MAIN = ("AIX", "blocking", "SS_DEFAULT", "SS_TPQ1_I96_B96",
         "SS_TPQ12_I8_B96", "SS_TPQ96_I1_B96")
 READY = ("AIX", "blocking", "readiness")
@@ -56,7 +59,7 @@ TERRAIN_BINS = {"Input receive": ("dl_recv / dl_frame_copy",),
                           "dl_output_reorder", "Other / overhead")}
 SS_BINS = {"Put": ("smartsim_put_tensor",), "Model request": ("smartsim_run_model",),
            "Retrieval/unpack": ("smartsim_unpack_tensor",),
-           "Other": ("smartsim_chunk_plan", "smartsim_token_wait", "Other / overhead")}
+           "Other": ("smartsim_chunk_plan",)}
 
 
 def read_csv(path):
@@ -132,7 +135,7 @@ def load_data():
         if len(tables[name]) != 70:
             raise ValueError(f"Terrain {name} is not 70 cells")
     latency, memory, phases, audit, preprocessing = [], [], [], [], []
-    for model in selected_models(True):
+    for model in MODELS:
         terrain = model in MODELS[:2]
         for variant in (*MAIN, "readiness"):
             base = {"model": model, "variant": variant}
@@ -198,7 +201,9 @@ def load_data():
                     raise ValueError("MAIA memory count")
                 memory.append(dict(base, metric="Kernel", value_GiB=number(mem[0]["peak_bytes"]) / 2**30,
                                    samples=1, ci_status="not_applicable_maximum", scope=mem[0]["scope"]))
-                scope = "dl_whole_client" if variant in READY[1:] else "solver_whole_run"
+                # Two-warmup steady scope: calls 3-7 only. PhyDLL uses its DL-side
+                # scope; AIX and SmartSim use the solver scope. All share five calls.
+                scope = "dl_steady" if variant in READY[1:] else "solver_steady"
                 regions = [r for r in tables["profile_regions.csv"] if r["workload"] == model
                            and r["variant"] == variant and r["scope"] == scope]
                 ranks = [r for r in tables["profile_rank_metrics.csv"] if r["workload"] == model
@@ -207,46 +212,39 @@ def load_data():
                 bins = {"Inference": ("inference",)} if variant == "AIX" else DL_NODES if variant in READY[1:] else SS_BINS
                 selected_nodes = []
                 for label, names in bins.items():
-                    if variant not in READY:
-                        # detailed_regions=false: absence is not a measured zero or MPI proxy.
-                        if any(r["region"] in {"smartsim_put_tensor", "smartsim_run_model", "smartsim_unpack_tensor"} for r in regions):
-                            raise ValueError("SmartSim instrumentation unexpectedly changed; re-audit")
-                        phases.append(dict(base, phase=label, mean_ms=None, ci_half_ms=None,
-                                           ci_status="unavailable_not_recorded", status="unavailable_not_recorded",
-                                           frames=None, independent_runs=1, scope=scope, nodes=";".join(names), samples_ms="[]"))
-                        continue
-                    frames = 7 if variant == "AIX" else 6
-                    value = inclusive_phase(regions, names, frames, parents)
+                    value = inclusive_phase(regions, names, STEADY_CALLS, parents)
                     for name in names:
                         row = next(r for r in regions if r["region"] == name)
                         node_ranks = [r for r in ranks if r["cnode"] == row["cnode"]]
                         if len(node_ranks) != 96 or len({r["rank"] for r in node_ranks}) != 96:
                             raise ValueError(f"Region rank count {base} {name}")
-                        if any(number(r["visits"]) != frames for r in node_ranks):
+                        if any(number(r["visits"]) != STEADY_CALLS for r in node_ranks):
                             raise ValueError(f"Per-rank visits mismatch {base} {name}")
                         if not math.isclose(np.mean([number(r["inclusive_s"]) for r in node_ranks]), number(row["inclusive_rankavg_s"]), rel_tol=1e-9):
                             raise ValueError("Region mean mismatch")
                         selected_nodes.append(row["cnode"])
                         audit.append(dict(base, scope=scope, phase=label, region=name, cnode=row["cnode"],
-                                          rank_count=96, visits_min=frames, visits_max=frames,
-                                          visits_rankavg=number(row["visits_rankavg"]), denominator_frames=frames))
+                                          rank_count=96, visits_min=STEADY_CALLS, visits_max=STEADY_CALLS,
+                                          visits_rankavg=number(row["visits_rankavg"]), denominator_frames=STEADY_CALLS))
                     phases.append(dict(base, phase=label, mean_ms=value, ci_half_ms=None,
-                                       ci_status="unavailable_single_independent_run", status="recorded", frames=frames,
+                                       ci_status="unavailable_single_independent_run", status="recorded", frames=STEADY_CALLS,
                                        independent_runs=1, scope=scope, nodes=";".join(names), samples_ms=json.dumps([value])))
                 assert_disjoint(selected_nodes, parents)
-                solver = [r for r in tables["profile_regions.csv"] if r["workload"] == model and r["variant"] == variant and r["scope"] == "solver_whole_run"]
-                for name, visits in (("flowex_extract_cubes", 35), ("flowex_reconstruct_output", 7)):
+                solver = [r for r in tables["profile_regions.csv"] if r["workload"] == model
+                          and r["variant"] == variant and r["scope"] == "solver_steady"]
+                for name in ("flowex_extract_cubes", "flowex_reconstruct_output"):
                     match = [r for r in solver if r["region"] == name]
-                    if len(match) != 1 or number(match[0]["visits_rankavg"]) != visits:
+                    if len(match) != 1 or number(match[0]["visits_rankavg"]) != STEADY_CALLS:
                         raise ValueError(f"Flowex schedule {base} {name}")
                     row = match[0]
-                    rr = [r for r in tables["profile_rank_metrics.csv"] if r["workload"] == model and r["variant"] == variant and r["scope"] == "solver_whole_run" and r["cnode"] == row["cnode"]]
-                    if len(rr) != 96 or any(number(r["visits"]) != visits for r in rr):
+                    rr = [r for r in tables["profile_rank_metrics.csv"] if r["workload"] == model
+                          and r["variant"] == variant and r["scope"] == "solver_steady" and r["cnode"] == row["cnode"]]
+                    if len(rr) != 96 or any(number(r["visits"]) != STEADY_CALLS for r in rr):
                         raise ValueError("Flowex per-rank visits")
-                    preprocessing.append(dict(base, region=name, visits_rankavg=visits, denominator_calls=7,
-                                              amortized_ms=number(row["inclusive_rankavg_s"]) * 1000 / 7,
-                                              per_visit_ms=number(row["inclusive_rankavg_s"]) * 1000 / visits,
-                                              scope="all seven calls including warmups; extraction has five history updates"))
+                    preprocessing.append(dict(base, region=name, visits_rankavg=STEADY_CALLS, denominator_calls=STEADY_CALLS,
+                                              amortized_ms=number(row["inclusive_rankavg_s"]) * 1000 / STEADY_CALLS,
+                                              per_visit_ms=number(row["inclusive_rankavg_s"]) * 1000 / STEADY_CALLS,
+                                              scope="five steady calls after two warmups"))
     hashes = [{"path": str(p.resolve()), "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
                "bytes": p.stat().st_size, "rows": len(tables[p.name])} for p in paths]
     return latency, memory, phases, audit, preprocessing, hashes
@@ -397,13 +395,16 @@ Library panels are actual instrumented scope times, never scaled to plain latenc
 Terrain phases use five replicate means of ten steady steps and the existing SIMPLIFIED phase bins:
 AIx application provider inference, PhyDLL DL-side provider scope, SmartSim solver-side client scope.
 SmartSim model request is client elapsed time, not isolated RedisAI compute.
-MAIA AIx uses inclusive inference / seven visits per solver rank, including warmups.
-MAIA PhyDLL uses six recorded frames per DL rank: first frame excluded, one warmup remains;
-these are NOT five steady calls. Input combines inclusive dl_recv and dl_frame_copy;
-forward uses dl_torch_forward; output uses dl_send_output (never its dl_send descendant again).
-Other includes only allocation, unpack, H2D, D2H and reorder staging nodes. Selected inclusive nodes
-are checked for ancestor overlap, and per-cnode counts are checked separately on all 96 scope ranks.
-SmartSim MAIA detailed client nodes are absent (detailed_regions=false); no MPI/root proxy is used.
+MAIA phases all use the same two-warmup steady scope: inference calls 3-7, five recorded calls
+per solver or DL rank. Runs instrumented under PROFILE_SCOPE_VERSION=steady-v1 select only the
+cmi_inference_steady / dl_inference_steady subtrees, so warmup calls are not mixed in.
+AIx uses inclusive inference; PhyDLL uses the DL-side scope where input combines inclusive
+dl_recv and dl_frame_copy, forward uses dl_torch_forward, and output uses dl_send_output
+(never its dl_send descendant again). Other includes only allocation, unpack, H2D, D2H and
+reorder staging nodes. SmartSim uses smartsim_put_tensor / run_model / unpack_tensor / chunk_plan;
+these are now recorded and are client scope, not RedisAI-internal compute.
+Selected inclusive nodes are checked for ancestor overlap, and per-cnode counts are checked
+separately on all 96 scope ranks.
 See data/region_counts.csv for actual group, node, communicator and visit counts.
 
 Terrain memory is the maximum sampled summed process PSS and RSS across five replicate jobs.
@@ -412,9 +413,10 @@ page cache, in GiB. These different measures are not interchangeable or inferenc
 Neither maximum has a CI. Memory runs are separate from timing/profile runs.
 
 Optional preprocessing is explicitly scoped, not whole preprocessing/postprocessing:
-flowex_extract_cubes has 35 visits/rank (five history updates x seven calls), reconstruction seven.
-Supplementary values amortize inclusive totals / seven calls, including warmups; per-visit values
-are also preserved in data/preprocessing.csv. They are not inferred from whole elapsed time.
+in the steady scope flowex_extract_cubes and flowex_reconstruct_output each have five
+visits/rank (one per measured inference call). Supplementary values amortize inclusive
+totals over those five steady calls; per-visit values are preserved in data/preprocessing.csv.
+They describe selected FlowEx regions, not full preprocessing or postprocessing.
 
 ## Caption Suggestions
 
@@ -428,7 +430,6 @@ Explain N/A as unrecorded instrumentation, not zero runtime.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=OUTPUT)
-    parser.add_argument("--include-mlp-ov0", action="store_true")
     parser.add_argument("--preprocessing", action="store_true")
     args = parser.parse_args()
     latency, memory, phases, audit, preprocessing, hashes = load_data()
@@ -440,9 +441,8 @@ def main():
                        ("region_counts", audit), ("preprocessing", preprocessing)):
         write_csv(output / "data" / (name + ".csv"), rows)
     records = []
-    for model in selected_models(args.include_mlp_ov0):
-        folder = "supplement" if model == "mlp_ov0" else "main"
-        save(comparison([model], latency, memory, phases), output, f"{folder}/{model}_comparison", records)
+    for model in MODELS:
+        save(comparison([model], latency, memory, phases), output, f"main/{model}_comparison", records)
         save(comparison([model], latency, memory, phases, True), output, f"readiness/{model}_comparison", records)
     for solver, models in (("terrain", MODELS[:2]), ("maia", MODELS[2:])):
         save(comparison(models, latency, memory, phases), output, f"main/{solver}_overview", records)
@@ -486,7 +486,7 @@ def main():
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     links = "\n".join(f"- `{r['name']}`: [PNG]({r['name']}.png) | [PDF]({r['name']}.pdf)" for r in records)
     command = "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/bin/python3 plot_cpu_comparison.py"
-    flags = (" --include-mlp-ov0" if args.include_mlp_ov0 else "") + (" --preprocessing" if args.preprocessing else "")
+    flags = " --preprocessing" if args.preprocessing else ""
     (output / "README.md").write_text("# CPU Figure Index\n\nRegenerate from cpu_benchmark:\n\n`" + command + flags + "`\n\n"
         "Prefer main per-model triptychs for detail, solver overviews for compact comparison.\n"
         "Alternatives offer four-model latency, memory and full-legend phase layouts.\n"

@@ -25,13 +25,18 @@ Output: `results/cpu_final_20261013/maia/` relative to this directory.
   divided by actual region visits, not inferred ML-call counts.
 
 All 63 timing/profile/memory selections are validated. The profiling figures
-are diagnostics, **not final steady inference-phase decompositions**: the
-profiles do not expose a reliable ML-call parent or separate steady/warmup
-scopes. They include startup, non-ML work, and warmups, and use rank-average
-metrics rather than solver-rank maxima. SmartSim client profiles do not measure
-RedisAI internals. A true steady-phase figure would require suitable profiling
-scopes and new profiling measurements; do not estimate it by scaling these
-whole-run profiles to plain timing.
+here are **whole-run diagnostics**, not steady inference-phase decompositions:
+they include startup, non-ML work, and warmups, and expose no reliable ML-call
+parent in this build.
+
+Superseded for phase figures: the two-warmup re-profiling campaign (jobs
+5007387-5007401, `CPU_STEADY_PROFILE_20261014.md`) adds `cmi_inference_steady`
+and `dl_inference_steady` scopes. Those steady profiles now back the phase panels
+in `../figures/cpu_final/` (calls 3-7, five-call denominator) and include the
+previously missing SmartSim client phases. The whole-run tables below remain as
+diagnostics and for the extraction/reconstruction visit audit. SmartSim client
+profiles still do not measure RedisAI internals, and no whole-run profile is
+scaled to plain timing.
 
 ## Terrain
 
