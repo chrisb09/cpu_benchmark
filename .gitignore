@@ -22,3 +22,6 @@ __pycache__/
 
 # Shared local CPU figure exports and derived audit tables
 figures/cpu_final/
+
+# Isolated PhyDLL diagnostic outputs and frozen runtime snapshots
+diagnostics/

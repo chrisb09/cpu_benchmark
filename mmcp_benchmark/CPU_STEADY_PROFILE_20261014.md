@@ -192,3 +192,31 @@ figure set. Plain timing, memory, and terrain measurements are unchanged.
 
 Verified steady values match the timing trend, e.g. transformer AIX steady
 inference ~19235 ms/visit against a plain steady ML-step mean of ~21084 ms.
+
+## Latency CI Campaign
+
+m-aia latency previously had one independent run per cell. To match the terrain
+95% t CI (five independent run means, df=4, t=2.776445), 4 extra plain-timing
+repetitions were submitted per cell for the two presented workloads x seven
+variants: **56 jobs** (rep 1 is the existing selected run). No rebuild: the
+frozen `build_cpu_retest_plain` binary is reused so every rep shares rep-1
+provenance.
+
+- Submission: `mmcp_benchmark/slurm/submit_maia_ci_reps.sh` (dry-run first).
+- Job map: `results/cpu_final_steady_20261014/maia_ci_jobs.csv`.
+- Analysis: `mmcp_benchmark/maia_latency_ci.py` reads each run's solver.log,
+  requires the seven-call schedule and rank-maximum timings, computes a run mean
+  over calls 3-7, then the mean and t CI over the five run means. Output
+  `maia/maia_latency_summary.csv` and `maia/maia_latency_reps.csv`.
+- Figures: `plot_cpu_comparison.py` now reads the summary for MAIA latency and
+  draws the same style of CI whisker as terrain; the cell rows record five
+  independent runs and their sample means.
+
+Memory maxima and phase panels remain single-run by design.
+
+All 56 CI jobs completed. Example five-run CIs: transformer AIX 21.28 +/- 1.32 s,
+SmartSim default 1459.0 +/- 6.6 s, TPQ1/I96 1039.1 +/- 11.6 s, TPQ96/I1
+27.71 +/- 0.68 s. The PhyDLL modes are genuinely variable run to run: transformer
+readiness run means span 21.7-106.0 s (CI +/- 39.5 s) and blocking 57.6-73.9 s,
+which the whiskers now show honestly. Figures regenerated with CI whiskers for
+both solvers; the plotting suite is 22 tests.

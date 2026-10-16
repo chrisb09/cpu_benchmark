@@ -34,23 +34,82 @@ reprofiled and is no longer a figure model.
 - `readiness/readiness_latency_2x2`: compact latency-only readiness alternative.
 - `supplement/preprocessing`: optional extraction/reconstruction regions, not
   an inferred whole preprocessing/postprocessing breakdown.
+- `solver/{terrain,maia}_time_memory`: four panels in one row, ordered as
+  model 1 time/memory then model 2 time/memory.
+- `solver/{watercnn,giant,transformer,mlp_ov4}_phases`: four separate full-width
+  model figures with rotated phase labels
+  below individual bars and provider/configuration labels below each group.
+  No color-only legend is needed in this layout.
 
-The optional invocation produces 15 PNG/PDF pairs; the default produces 14.
+The optional invocation produces 33 PNG/PDF pairs; the default produces 32.
+This includes twelve individual solver panels under `solver/panels/`.
+
+### Native Thesis Size
+
+The thesis at `~/Master-Thesis/gitlab/thesis` uses 12pt `scrbook`, A4 and
+BCOR=1cm with Latin Modern. Its compiled `thesis.log` reports a text width of
+426.7914 TeX pt, or 150 mm. Solver previews are exactly that width, without
+tight-bounding-box resizing. Four-panel rows allocate 36 mm per panel with 2 mm
+gaps. Phase figures each use the full 150 mm. Combined time/memory previews have
+embedded (a)-(d) model/metric subcaptions; phase previews identify their model
+below the axis. Only the standalone exports under `solver/panels/` omit captions
+and panel letters. Those exports preserve the panel widths but omit the preview
+caption band, avoiding empty bottom space.
+The thesis source is not modified and no LaTeX integration is generated.
+
+Native solver panels use 7pt axis labels, 6pt ticks and 5.5-6pt numerical labels.
+Configuration labels spell out SmartSim and use TPQ/INTRA pairs. Phase figures
+use seconds per rank to reduce long tick labels at print size; the source and
+audit tables remain in milliseconds. Other figure layouts keep their own sizes.
 Plot titles contain only models and concise panel headings. Longer scope and
 statistical explanations live in the shared index, not in plot-level captions.
 The serif type, light horizontal grids, phase colors and grouped columns follow
 the terrain production phase reference. Readiness uses the prior paired-bar
-concept, with hatching distinguishing readiness and RSS rather than new colors.
+concept, with hatching distinguishing readiness rather than new colors.
+Figures use reduced heights, `[TS]`/`[TBL]` model labels, `PhyDLL` in main
+comparisons and `default` versus `readiness` in readiness comparisons. AIx's
+single phase is labeled Forward and uses the same bar width as other phases;
+its measured scope remains the inclusive AIx library call, not isolated compute.
 
 ## Scientific Constraints
 
 Main configurations are AIx, PhyDLL blocking, SmartSim default and three tuned
 SmartSim configurations. Readiness is excluded from all main layouts.
-Five independent terrain run means support a terrain-only 95% t interval
-(`t=2.776445`, `df=4`); five correlated MAIA calls from one run do not.
-MAIA latency uses actual rank-maximum ML-step time, not a region or inferred sum.
-Memory bars are maxima without CIs: terrain sampled PSS/RSS versus MAIA kernel
-cgroup whole-job lifetime peaks. GiB means bytes divided by `2**30`.
+Latency whiskers are 95% t intervals (`t=2.776445`, `df=4`) over five independent
+run means for both solvers: terrain run means use ten steady calls, MAIA run means
+use five steady calls (inference calls 3-7). MAIA latency is the actual rank-maximum
+ML-step time, not a region or inferred sum.
+Memory plots show one bar per configuration, without CIs: terrain sampled PSS
+versus MAIA kernel cgroup whole-job lifetime peaks. RSS remains in the audit CSV
+but is not plotted. This is visual consistency, not identical measurement scope:
+PSS apportions shared resident pages; cgroup peaks also include charged cache.
+GiB means bytes divided by `2**30`.
+Memory axes say only `Peak memory (GiB)`; measurement details remain in the index
+and audit CSVs. Error-bar caps use a narrow 1.3pt half-width.
+
+### Timing And Phase Comparability
+
+Latency whiskers are confidence intervals of the mean, not standard deviations.
+The sampling unit is an independent execution: each run first averages its steady
+calls, then the five run means supply the t interval (df=4). Ranks and calls within
+one execution are not counted as independent replicates. With only five runs,
+normality of run means is not assured; wide intervals warrant more independent
+runs rather than pooling calls or claiming a default/readiness ordering.
+
+Phase bars are not a decomposition of adjacent plain latency bars: they average
+across scope ranks, while synchronized solver latency reflects slow ranks and
+additional coupling work. They also come from separate profiling executions.
+MAIA has one independent profile per configuration, terrain five; no phase CIs
+are drawn. More independent profiles are needed to quantify MAIA phase variability.
+
+For Transformer default, the preserved profiling run has mean-rank Forward
+28.855 s, maximum rank's five-call Forward mean 59.019 s, and synchronized
+ML-step mean 60.493 s. There is one forward per DL rank per frame, not two;
+the forecast window of two is not two model calls. Maximum rank means are not
+the same statistic as mean per-call maxima, but reveal substantial imbalance.
+For MLP ov4, the profiling jobs' synchronized ML-step means are 2.269 s default
+and 2.810 s readiness, whereas the five-run plain means are 3.625 s and 2.827 s.
+This documents a run-selection/order difference, not a swapped phase label.
 
 MAIA phase audits validate individual cnodes on all 96 ranks of the proper
 communicator. All MAIA providers now share one two-warmup steady scope: inference
@@ -78,13 +137,13 @@ The script fails closed for missing/ambiguous required regions, wrong visit or
 run counts, inclusive ancestor overlap, nonfinite values, and bad render metrics.
 The manifest checks 63 MAIA selected cells and 70 terrain cells in each campaign
 table, hashes all consumed CSVs, and records output dimensions and panel counts.
-Tests cover the CI formula, single-run CI absence, missing-data rejection,
+Tests cover the CI formula, run-mean CI scoping, missing-data rejection,
 steady five-call scopes, double counting, selections, scope counts, memory
 semantics, full legend labels and rendered image dimensions. Numerical model
 parity remains outside this plotting task; no solver runs are launched.
 
-The figures were regenerated on 2026-10-14 from the two-warmup steady profiles
-(jobs 5007387-5007401) and all 21 tests passed. Generated images and derived
+The figures use the two-warmup steady profiles (jobs 5007387-5007401).
+The revised layout suite contains 26 tests. Generated images and derived
 audit tables are ignored by Git under `figures/cpu_final/`; no legacy outputs
 were overwritten. Linear scaling can make very small bars hard to see when one
 provider dominates; numeric labels retain those measured values rather than

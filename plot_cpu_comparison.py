@@ -11,6 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.ticker import FuncFormatter, MaxNLocator
+from matplotlib.transforms import Bbox
 import numpy as np
 from PIL import Image
 
@@ -20,16 +21,19 @@ MAIA = ROOT / "mmcp_benchmark/results/cpu_final_steady_20261014/maia"
 TERRAIN = ROOT.parent / "mini_app/campaign_figures/terrain_cpu_complete_20261013"
 OUTPUT = ROOT / "figures/cpu_final"
 T95 = 2.776445
+# thesis/thesis.log: textwidth=426.7914 TeX pt (72.27 pt/in).
+THESIS_WIDTH_IN = 426.7914 / 72.27
+PANEL_GAP_IN = 2 / 25.4
 # Two-warmup scope: inference calls 3-7 measured against a five-call denominator.
 STEADY_CALLS = 5
 MAIN = ("AIX", "blocking", "SS_DEFAULT", "SS_TPQ1_I96_B96",
         "SS_TPQ12_I8_B96", "SS_TPQ96_I1_B96")
 READY = ("AIX", "blocking", "readiness")
 MODELS = ("watercnn", "giant", "transformer", "mlp_ov4")
-MODEL_LABELS = {"watercnn": "Terrain: WaterCNN", "giant": "Terrain: Giant MLP",
-                "transformer": "MAIA: Transformer OV0", "mlp_ov4": "MAIA: MLP OV4",
-                "mlp_ov0": "MAIA: MLP OV0"}
-LABELS = {"AIX": "AIx", "blocking": "PhyDLL\nblocking", "readiness": "PhyDLL\nreadiness",
+MODEL_LABELS = {"watercnn": "[TS] WaterCNN", "giant": "[TS] Giant MLP",
+                "transformer": "[TBL] Transformer ov0", "mlp_ov4": "[TBL] MLP ov4",
+                "mlp_ov0": "[TBL] MLP ov0"}
+LABELS = {"AIX": "AIx", "blocking": "PhyDLL", "readiness": "PhyDLL\nreadiness",
           "SS_DEFAULT": "SmartSim\ndefault", "SS_TPQ1_I96_B96": "SmartSim\nTPQ=1\nINTRA=96",
           "SS_TPQ12_I8_B96": "SmartSim\nTPQ=12\nINTRA=8",
           "SS_TPQ96_I1_B96": "SmartSim\nTPQ=96\nINTRA=1"}
@@ -48,7 +52,7 @@ FULL_LEGEND = {"Input receive": "Input receive (DL-side receive + handling)",
                "Put": "Put (client tensor submission)",
                "Model request": "Model request (client elapsed time)",
                "Retrieval/unpack": "Retrieval/unpack (client retrieval + unpack)",
-               "Inference": "Inference (AIx library call)"}
+                "Inference": "Forward (AIx library call)"}
 DL_NODES = {"Input receive": ("dl_recv", "dl_frame_copy"),
             "Forward": ("dl_torch_forward",), "Output send": ("dl_send_output",),
             "Other": ("dl_input_allocate", "dl_output_allocate", "dl_input_unpack",
@@ -125,7 +129,7 @@ def inclusive_phase(rows, names, frames, parents):
 
 def load_data():
     paths = [MAIA / name for name in ("source_manifest.csv", "latency_calls.csv", "memory.csv",
-             "profile_regions.csv", "profile_rank_metrics.csv")]
+             "profile_regions.csv", "profile_rank_metrics.csv", "maia_latency_summary.csv")]
     paths += [TERRAIN / name for name in ("timing_replicates.csv", "memory_replicates.csv",
               "phase_replicates.csv", "profile_manifest.csv")]
     tables = {p.name: read_csv(p) for p in paths}
@@ -184,18 +188,22 @@ def load_data():
                                        ci_status="not_shown_scope_comparison", status="recorded", frames=10,
                                        independent_runs=5, scope=chosen[0]["scope"], nodes=";".join(names), samples_ms=json.dumps(vals)))
             else:
+                # Rep-1 call schedule stays audited in latency_calls.csv.
                 calls = [r for r in tables["latency_calls.csv"] if r["workload"] == model and r["variant"] == variant]
                 if len(calls) != 7 or len({r["job"] for r in calls}) != 1:
                     raise ValueError(f"MAIA timing schedule {base}")
-                steady = [r for r in calls if r["steady"] == "True"]
-                if len(steady) != 5 or [int(r["step"]) for r in steady] != [73, 102, 131, 160, 189]:
-                    raise ValueError("MAIA steady schedule")
-                values = [number(r["ml_ms"]) for r in steady]
                 if any(number(r["ml_ms"]) != number(r["rank_max_ms"]) for r in calls):
                     raise ValueError("MAIA ML step is not actual rank maximum")
-                mean, ci, status = mean_ci(values, independent=False)
-                latency.append(dict(base, mean_ms=mean, ci_half_ms=ci, ci_status=status, independent_runs=1,
-                                    calls_per_run=5, samples_ms=json.dumps(values), scope="plain steady solver-rank maximum ML step"))
+                # Latency is the mean of five independent run means with a 95% t CI (df=4).
+                rows = [r for r in tables["maia_latency_summary.csv"]
+                        if r["workload"] == model and r["variant"] == variant]
+                if len(rows) != 1 or int(rows[0]["independent_runs"]) != 5:
+                    raise ValueError(f"MAIA independent-run CI {base}")
+                row = rows[0]
+                latency.append(dict(base, mean_ms=number(row["mean_ms"]), ci_half_ms=number(row["ci_half_ms"]),
+                                    ci_status=row["ci_status"], independent_runs=5, calls_per_run=5,
+                                    samples_ms=row["samples_ms"],
+                                    scope="mean of five independent runs; each run is a solver-rank maximum ML step"))
                 mem = [r for r in tables["memory.csv"] if r["workload"] == model and r["variant"] == variant]
                 if len(mem) != 1:
                     raise ValueError("MAIA memory count")
@@ -275,19 +283,24 @@ def label_bar(ax, x, value, error=0, rotation=0):
                 ha="center", va="bottom", fontsize=7, rotation=rotation)
 
 
+def config_labels(variants):
+    return ["PhyDLL\ndefault" if v == "blocking" and "readiness" in variants else LABELS[v]
+            for v in variants]
+
+
 def latency_panel(ax, model, data, variants):
     for x, variant in enumerate(variants):
         row = next(r for r in data if (r["model"], r["variant"]) == (model, variant))
         value, ci = row["mean_ms"] / 1000, row["ci_half_ms"]
         error = ci / 1000 if ci is not None else None
         ax.bar(x, value, width=.58, color=PROVIDER_COLORS[variant], edgecolor="#444444", linewidth=.5,
-               yerr=error, capsize=3, error_kw={"linewidth": .8})
+               yerr=error, capsize=1.3, error_kw={"linewidth": .7, "capthick": .7})
         label_bar(ax, x, value, error or 0)
-    ax.set_xticks(range(len(variants)), [LABELS[v] for v in variants])
+    ax.set_xticks(range(len(variants)), config_labels(variants))
     finish_axis(ax, "Mean ML-step time (s)")
 
 
-def phase_panel(ax, model, data, variants, readiness=False):
+def phase_panel(ax, model, data, variants, readiness=False, direct_labels=False):
     if readiness:
         labels = list(DL_NODES)
         for j, variant in enumerate(READY[1:]):
@@ -298,28 +311,39 @@ def phase_panel(ax, model, data, variants, readiness=False):
                        hatch="///" if j else None, edgecolor="#444444", linewidth=.5)
                 label_bar(ax, pos, row["mean_ms"])
         ax.set_xticks(range(4), ["Input\nreceive", "Forward", "Output\nsend", "Other"])
-        ax.legend(handles=[Patch(facecolor="white", edgecolor="#444444", label="Blocking"),
+        ax.legend(handles=[Patch(facecolor="white", edgecolor="#444444", label="Default"),
                            Patch(facecolor="white", edgecolor="#444444", hatch="///", label="Readiness")],
                   loc="upper right", fontsize=7, frameon=False)
     else:
+        positions, phase_labels = [], []
         for x, variant in enumerate(variants):
             rows = [r for r in data if (r["model"], r["variant"]) == (model, variant)]
             if all(r["mean_ms"] is None for r in rows):
                 ax.text(x, .025, "N/A", transform=ax.get_xaxis_transform(), ha="center", fontsize=8, color="#777777")
                 continue
-            width = .76 / len(rows)
+            width = .19
             for j, row in enumerate(rows):
                 pos = x + (j - (len(rows) - 1) / 2) * width
                 ax.bar(pos, row["mean_ms"], width=width * .9, color=COLORS[row["phase"]],
                        edgecolor="#444444", linewidth=.4)
                 label_bar(ax, pos, row["mean_ms"], rotation=90)
-        ax.set_xticks(range(len(variants)), [LABELS[v] for v in variants])
-    finish_axis(ax, "Mean phase time / scope rank (ms)")
+                positions.append(pos)
+                phase_labels.append("Forward" if row["phase"] == "Inference" else row["phase"])
+            if direct_labels:
+                ax.text(x, -.52, LABELS[variant], transform=ax.get_xaxis_transform(),
+                        ha="center", va="top", fontsize=8)
+        if direct_labels:
+            ax.set_xticks(positions, phase_labels, rotation=55, ha="right", fontsize=7)
+            for x in range(len(variants) - 1):
+                ax.axvline(x + .5, color="#dddddd", linewidth=.6)
+        else:
+            ax.set_xticks(range(len(variants)), ["AIx\nForward" if v == "AIX" else LABELS[v] for v in variants])
+    finish_axis(ax, "Mean phase time (ms / rank)")
     ax.set_ylim(0, ax.get_ylim()[1] * 1.12)
 
 
 def memory_panel(ax, model, data, variants):
-    kinds = ["PSS", "RSS"] if model in MODELS[:2] else ["Kernel"]
+    kinds = ["PSS"] if model in MODELS[:2] else ["Kernel"]
     for x, variant in enumerate(variants):
         for j, kind in enumerate(kinds):
             row = next(r for r in data if (r["model"], r["variant"], r["metric"]) == (model, variant, kind))
@@ -328,8 +352,8 @@ def memory_panel(ax, model, data, variants):
                    color=PROVIDER_COLORS[variant], hatch="///" if kind == "RSS" else None,
                    edgecolor="#444444", linewidth=.5)
             label_bar(ax, pos, row["value_GiB"], rotation=90 if len(kinds) == 2 else 0)
-    ax.set_xticks(range(len(variants)), [LABELS[v] for v in variants])
-    finish_axis(ax, "Maximum memory (GiB)")
+    ax.set_xticks(range(len(variants)), config_labels(variants))
+    finish_axis(ax, "Peak memory (GiB)")
     if len(kinds) == 2:
         ax.legend(handles=[Patch(facecolor="white", edgecolor="#444444", label="PSS"),
                            Patch(facecolor="white", edgecolor="#444444", hatch="///", label="RSS")],
@@ -337,14 +361,14 @@ def memory_panel(ax, model, data, variants):
 
 
 def phase_legend(fig, full=False):
-    fig.legend(handles=[Patch(facecolor=COLORS[k], label=FULL_LEGEND[k] if full else k)
+    fig.legend(handles=[Patch(facecolor=COLORS[k], label=FULL_LEGEND[k] if full else "Forward (AIx)" if k == "Inference" else k)
                         for k in FULL_LEGEND], loc="lower center", ncol=2 if full else 4,
                frameon=False, fontsize=8, bbox_to_anchor=(.5, .005), columnspacing=1.8)
 
 
 def comparison(models, latency, memory, phases, readiness=False):
     variants = READY if readiness else MAIN
-    fig, axes = plt.subplots(len(models), 3, figsize=(15.5, 4.6 * len(models) + .6), squeeze=False)
+    fig, axes = plt.subplots(len(models), 3, figsize=(15.5, 2.5 * len(models) + .7), squeeze=False)
     for row, model in enumerate(models):
         latency_panel(axes[row, 0], model, latency, variants)
         phase_panel(axes[row, 1], model, phases, variants, readiness)
@@ -352,27 +376,85 @@ def comparison(models, latency, memory, phases, readiness=False):
         for ax, title in zip(axes[row], ("(a) ML-step time", "(b) Library inference phases", "(c) Memory footprint")):
             ax.set_title(title, loc="left", pad=12)
         axes[row, 1].text(.5, 1.17, MODEL_LABELS[model], transform=axes[row, 1].transAxes,
-                          ha="center", fontsize=13)
+                          ha="center", fontsize=11)
     if not readiness:
         phase_legend(fig)
     fig.subplots_adjust(left=.065, right=.985, top=.84 if len(models) == 1 else .91,
-                        bottom=.24 if len(models) == 1 else .14, wspace=.32, hspace=.65)
+                        bottom=.34 if len(models) == 1 else .22, wspace=.32, hspace=.95)
     return fig
 
 
-def save(fig, output, name, records):
+def solver_summary(models, latency, memory, phases, phase_only=False, captions=True):
+    count = len(models) if phase_only else 2 * len(models)
+    caption_band = .28 if captions else 0
+    height = 2.15 + caption_band
+    fig = plt.figure(figsize=(THESIS_WIDTH_IN, height))
+    slot = (THESIS_WIDTH_IN - (count - 1) * PANEL_GAP_IN) / count
+    axes = []
+    for index in range(count):
+        start = index * (slot + PANEL_GAP_IN)
+        left = .55 if phase_only else .46
+        bottom = .78 + caption_band
+        axes.append(fig.add_axes([(start + left) / THESIS_WIDTH_IN, bottom / height,
+                                 (slot - left - .05) / THESIS_WIDTH_IN, 1.23 / height]))
+    if phase_only:
+        seconds = [dict(row, mean_ms=row["mean_ms"] / 1000) for row in phases]
+        for ax, model in zip(axes, models):
+            phase_panel(ax, model, seconds, MAIN, direct_labels=True)
+            short = {"Input receive": "Receive", "Output send": "Send",
+                     "Model request": "Request", "Retrieval/unpack": "Get/unpack"}
+            labels = [short.get(t.get_text(), t.get_text()) for t in ax.get_xticklabels()]
+            ax.set_xticks(ax.get_xticks(), labels, rotation=65, ha="right")
+            for text in ax.texts:
+                if text.get_transform() == ax.get_xaxis_transform():
+                    text.set_y(-.44)
+            ax.set_ylabel("Phase time (s / rank)")
+    else:
+        for index, model in enumerate(models):
+            latency_panel(axes[2 * index], model, latency, MAIN)
+            memory_panel(axes[2 * index + 1], model, memory, MAIN)
+            for ax in axes[2 * index:2 * index + 2]:
+                ax.set_xticks(range(len(MAIN)), ["AIx", "PhyDLL", "SmartSim default", "SmartSim 1/96", "SmartSim 12/8", "SmartSim 96/1"],
+                              rotation=65, ha="right")
+            axes[2 * index].set_ylabel("ML-step time (s)")
+    for ax in axes:
+        ax.yaxis.label.set_size(7)
+        ax.yaxis.labelpad = 2
+        ax.tick_params(axis="both", labelsize=6, length=2, pad=2)
+        ax.yaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:g}"))
+        for text in ax.texts:
+            text.set_fontsize(5.5 if phase_only else 6)
+            if isinstance(text, matplotlib.text.Annotation):
+                text.set_rotation(90)
+    if captions:
+        for index in range(count):
+            model = models[index if phase_only else index // 2]
+            metric = "Library phases" if phase_only else ("ML-step time", "Memory")[index % 2]
+            center = (index * (slot + PANEL_GAP_IN) + slot / 2) / THESIS_WIDTH_IN
+            prefix = "" if count == 1 else f"({chr(97 + index)}) "
+            fig.text(center, .04 / height,
+                     f"{prefix}{MODEL_LABELS[model]}\n{metric}",
+                     ha="center", va="bottom", fontsize=6.5)
+    return fig
+
+
+def save(fig, output, name, records, native=False, bbox=None, close=True):
     path = output / name
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path.with_suffix(".png"), bbox_inches="tight", pad_inches=.12)
-    fig.savefig(path.with_suffix(".pdf"), bbox_inches="tight", pad_inches=.12)
+    bounds = bbox if bbox is not None else None if native else "tight"
+    fig.savefig(path.with_suffix(".png"), bbox_inches=bounds, pad_inches=0 if native else .12)
+    fig.savefig(path.with_suffix(".pdf"), bbox_inches=bounds, pad_inches=0 if native else .12)
     with Image.open(path.with_suffix(".png")) as image:
         width, height = image.size
         variation = float(np.asarray(image.convert("RGB")).std())
-    if width < 1000 or height < 600 or variation < 8 or path.with_suffix(".pdf").stat().st_size < 1000:
+    if width < (200 if native else 1000) or height < (300 if native else 350) or variation < 8 or path.with_suffix(".pdf").stat().st_size < 1000:
         raise ValueError(f"Invalid rendered image {name}")
-    records.append({"name": name, "panels": len(fig.axes), "width": width, "height": height,
+    records.append({"name": name, "panels": 1 if bbox is not None else len(fig.axes), "width": width, "height": height,
+                    "native_width_mm": (bbox.width if bbox is not None else fig.get_figwidth()) * 25.4 if native else None,
                     "pixel_std": variation, "pdf_bytes": path.with_suffix(".pdf").stat().st_size})
-    plt.close(fig)
+    if close:
+        plt.close(fig)
 
 
 def write_csv(path, rows):
@@ -386,10 +468,15 @@ NOTES = """## Measurement Notes
 
 Main figures exclude readiness; readiness figures compare AIx reference with blocking and readiness.
 All axes are linear, with independent subplot scales. Numeric labels are means or maxima, not medians.
-Terrain latency whiskers: 95% t CI over five independent run means, t=2.776445, df=4;
-each run mean uses ten steady calls. MAIA latency: actual solver-rank maximum ML-step time,
-averaged over five sequential steady calls in one run; independent-run CI unavailable.
+Latency whiskers are 95% t CIs over five independent run means, t=2.776445, df=4.
+Terrain run means use ten steady calls each; MAIA run means use five steady calls each
+(inference calls 3-7), and MAIA latency is the actual solver-rank maximum ML-step time.
 No phase or memory CI is drawn. No missing metric is represented by zero: N/A means not recorded.
+ML-step times and phases are not a matched decomposition: latency is synchronized solver
+elapsed time (rank maximum), whereas phases are scope-rank averages from separate
+profiling runs. MAIA has one independent profile per configuration (five calls),
+terrain has five (ten calls each). Rank imbalance and run variability can change
+both the magnitude and the ordering; phase sums need not equal ML-step latency.
 
 Library panels are actual instrumented scope times, never scaled to plain latency.
 Terrain phases use five replicate means of ten steady steps and the existing SIMPLIFIED phase bins:
@@ -407,7 +494,8 @@ Selected inclusive nodes are checked for ancestor overlap, and per-cnode counts 
 separately on all 96 scope ranks.
 See data/region_counts.csv for actual group, node, communicator and visit counts.
 
-Terrain memory is the maximum sampled summed process PSS and RSS across five replicate jobs.
+Terrain memory plots show only the maximum sampled summed process PSS across five replicate jobs;
+RSS is retained in the audit CSV but not plotted. PSS apportions shared resident pages.
 MAIA memory is one kernel whole-job cgroup lifetime high-water mark, including startup and charged
 page cache, in GiB. These different measures are not interchangeable or inference-only footprints.
 Neither maximum has a CI. Memory runs are separate from timing/profile runs.
@@ -420,9 +508,9 @@ They describe selected FlowEx regions, not full preprocessing or postprocessing.
 
 ## Caption Suggestions
 
-Describe latency whiskers as terrain-only 95% independent-run t intervals; MAIA has one run.
-Describe library bars as provider-specific rank-average instrumented phases with different call scopes.
-Describe memory bars as maxima and explicitly distinguish sampled PSS/RSS from kernel cgroup peaks.
+Describe latency whiskers as 95% t intervals over five independent run means for both solvers.
+Describe library bars as provider-specific rank-average instrumented phases, using ten steady calls for terrain and five for MAIA.
+Describe memory bars as maxima and explicitly distinguish sampled PSS from kernel cgroup peaks.
 Explain N/A as unrecorded instrumentation, not zero runtime.
 """
 
@@ -446,8 +534,27 @@ def main():
         save(comparison([model], latency, memory, phases, True), output, f"readiness/{model}_comparison", records)
     for solver, models in (("terrain", MODELS[:2]), ("maia", MODELS[2:])):
         save(comparison(models, latency, memory, phases), output, f"main/{solver}_overview", records)
+        fig = solver_summary(models, latency, memory, phases)
+        save(fig, output, f"solver/{solver}_time_memory", records, native=True)
+        fig = solver_summary(models, latency, memory, phases, captions=False)
+        count = len(fig.axes)
+        slot = (THESIS_WIDTH_IN - (count - 1) * PANEL_GAP_IN) / count
+        for index in range(count):
+            model = models[index // 2]
+            metric = ("latency", "memory")[index % 2]
+            bbox = Bbox.from_bounds(index * (slot + PANEL_GAP_IN), 0, slot, fig.get_figheight())
+            save(fig, output, f"solver/panels/{model}_{metric}", records, native=True, bbox=bbox, close=False)
+        plt.close(fig)
+        for model in models:
+            for captions in (True, False):
+                fig = solver_summary([model], latency, memory, phases, phase_only=True, captions=captions)
+                folder = "solver" if captions else "solver/panels"
+                save(fig, output, f"{folder}/{model}_phases", records, native=True)
+        # Remove only the superseded generated two-model phase previews.
+        for suffix in ("png", "pdf"):
+            (output / f"solver/{solver}_phases.{suffix}").unlink(missing_ok=True)
     for kind in ("latency", "memory", "phases", "readiness_latency"):
-        fig, axes = plt.subplots(2, 2, figsize=(12.5, 10))
+        fig, axes = plt.subplots(2, 2, figsize=(12.5, 6))
         for ax, model in zip(axes.flat, MODELS):
             if kind in ("latency", "readiness_latency"):
                 latency_panel(ax, model, latency, READY if kind.startswith("readiness") else MAIN)
@@ -463,7 +570,7 @@ def main():
         folder = "readiness" if kind.startswith("readiness") else "alternatives"
         save(fig, output, f"{folder}/{kind}_2x2", records)
     if args.preprocessing:
-        fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.5))
+        fig, axes = plt.subplots(1, 2, figsize=(12.5, 2.8))
         for ax, model in zip(axes, MODELS[2:]):
             for j, region in enumerate(("flowex_extract_cubes", "flowex_reconstruct_output")):
                 for x, variant in enumerate(MAIN):
@@ -474,7 +581,7 @@ def main():
             ax.set_xticks(range(6), [LABELS[v] for v in MAIN])
             ax.set_title(MODEL_LABELS[model], loc="left")
             finish_axis(ax, "Amortized region time / call (s)")
-        fig.legend(handles=[Patch(color="#4C78A8", label="Flowex extraction (five history updates)"),
+        fig.legend(handles=[Patch(color="#4C78A8", label="Flowex extraction (one visit per steady call)"),
                             Patch(color="#54A24B", label="Flowex reconstruction")], loc="lower center", ncol=2, frameon=False)
         fig.subplots_adjust(left=.08, right=.98, top=.9, bottom=.28, wspace=.25)
         save(fig, output, "supplement/preprocessing", records)
@@ -489,6 +596,10 @@ def main():
     flags = " --preprocessing" if args.preprocessing else ""
     (output / "README.md").write_text("# CPU Figure Index\n\nRegenerate from cpu_benchmark:\n\n`" + command + flags + "`\n\n"
         "Prefer main per-model triptychs for detail, solver overviews for compact comparison.\n"
+        "The solver/ folder offers captioned four-panel time/memory rows and four full-width model-specific phase figures.\n"
+        "Solver previews are natively 150 mm wide (thesis text width); solver/panels/ contains caption-free individual PDFs/PNGs.\n"
+        "Time/memory panel widths are 36 mm, allowing 2 mm gaps; individual phase panels are 150 mm wide.\n"
+        "Numeric configuration pairs are TPQ/INTRA; Receive/Send are DL-side, Request is client elapsed time.\n"
         "Alternatives offer four-model latency, memory and full-legend phase layouts.\n"
         "Readiness is a separate comparison, not a seventh main provider.\n\n" + links + "\n\n" + NOTES
         + "\n## Audit Files\n\n[Manifest and source SHA256](manifest.json), [latency](data/latency.csv), "

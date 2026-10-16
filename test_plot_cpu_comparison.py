@@ -92,12 +92,19 @@ class SourceAndRenderingTests(unittest.TestCase):
         self.assertIn("mlp_ov0", plot.selected_models(True))
 
     def test_maia_ci_and_recorded_phases(self):
-        rows = [r for r in self.latency if r["model"] not in plot.MODELS[:2]]
-        self.assertTrue(all(r["ci_half_ms"] is None and r["independent_runs"] == 1 for r in rows))
+        # MAIA latency is now a five-independent-run mean with a 95% t CI.
+        rows = [r for r in self.latency if r["model"] in plot.MODELS[2:]]
+        self.assertTrue(rows)
+        self.assertTrue(all(r["independent_runs"] == 5 and r["ci_half_ms"] is not None
+                            and r["ci_status"] == "available_95pct_t_df4" for r in rows))
         # Two-warmup scope means every provider, SmartSim included, is recorded.
         self.assertFalse([r for r in self.phases if r["status"] == "unavailable_not_recorded"])
         maia = [r for r in self.phases if r["model"] in plot.MODELS[2:]]
         self.assertTrue(maia and all(r["frames"] == plot.STEADY_CALLS for r in maia))
+
+    def test_maia_ci_uses_five_run_means(self):
+        for r in [x for x in self.latency if x["model"] in plot.MODELS[2:]]:
+            self.assertEqual(len(json.loads(r["samples_ms"])), 5)
 
     def test_visit_counts_and_no_send_descendant(self):
         self.assertTrue(all(r["visits_min"] == r["visits_max"] == plot.STEADY_CALLS for r in self.audit))
@@ -123,6 +130,62 @@ class SourceAndRenderingTests(unittest.TestCase):
         self.assertEqual(len(fig.axes[1].patches), 8)
         self.assertEqual(len(fig.axes[1].get_xticklabels()), 4)
         self.assertEqual(len(fig.axes[0].patches), 3)
+        self.assertIn("PhyDLL\ndefault", [t.get_text() for t in fig.axes[0].get_xticklabels()])
+
+    def test_single_memory_bar_per_configuration(self):
+        for model in plot.MODELS:
+            fig, ax = plt.subplots()
+            plot.memory_panel(ax, model, self.memory, plot.MAIN)
+            self.assertEqual(len(ax.patches), len(plot.MAIN))
+            metric = "PSS" if model in plot.MODELS[:2] else "Kernel"
+            expected = [next(r["value_GiB"] for r in self.memory
+                             if (r["model"], r["variant"], r["metric"]) == (model, v, metric))
+                        for v in plot.MAIN]
+            self.assertEqual([p.get_height() for p in ax.patches], expected)
+
+    def test_solver_layouts_and_uniform_phase_width(self):
+        for models in (plot.MODELS[:2], plot.MODELS[2:]):
+            fig = plot.solver_summary(models, self.latency, self.memory, self.phases)
+            self.assertEqual(len(fig.axes), 4)
+            self.assertAlmostEqual(fig.get_figwidth() * 25.4, 150, places=3)
+            self.assertTrue(all(not ax.get_title(loc="left") for ax in fig.axes))
+            fig = plot.solver_summary(models, self.latency, self.memory, self.phases, phase_only=True)
+            self.assertEqual(len(fig.axes), 2)
+            for ax in fig.axes:
+                self.assertEqual(len({round(p.get_width(), 8) for p in ax.patches}), 1)
+                self.assertIn("Forward", [t.get_text() for t in ax.get_xticklabels()])
+                self.assertTrue(any(t.get_text() == "AIx" for t in ax.texts))
+                self.assertEqual(ax.get_ylabel(), "Phase time (s / rank)")
+
+    def test_native_panel_export_dimensions(self):
+        from matplotlib.transforms import Bbox
+        from PIL import Image
+        fig = plot.solver_summary(plot.MODELS[:2], self.latency, self.memory, self.phases, captions=False)
+        slot = (plot.THESIS_WIDTH_IN - 3 * plot.PANEL_GAP_IN) / 4
+        with tempfile.TemporaryDirectory(dir=plot.ROOT / "tmp") as tmp:
+            records = []
+            plot.save(fig, Path(tmp), "panel", records, native=True,
+                      bbox=Bbox.from_bounds(0, 0, slot, fig.get_figheight()))
+            self.assertAlmostEqual(records[0]["native_width_mm"], 36, places=3)
+            self.assertEqual(records[0]["panels"], 1)
+            with Image.open(Path(tmp) / "panel.png") as image:
+                self.assertAlmostEqual(image.width, slot * 170, delta=1)
+
+    def test_solver_captions_and_full_width_phases(self):
+        fig = plot.solver_summary(plot.MODELS[:2], self.latency, self.memory, self.phases)
+        self.assertEqual(len(fig.texts), 4)
+        self.assertTrue(fig.texts[0].get_text().startswith("(a) [TS]"))
+        self.assertTrue(fig.texts[-1].get_text().startswith("(d) [TS]"))
+        self.assertIn("SmartSim default", [t.get_text() for t in fig.axes[0].get_xticklabels()])
+        standalone = plot.solver_summary(plot.MODELS[:2], self.latency, self.memory, self.phases, captions=False)
+        self.assertFalse(standalone.texts)
+        for model in plot.MODELS:
+            fig = plot.solver_summary([model], self.latency, self.memory, self.phases,
+                                      phase_only=True, captions=False)
+            self.assertEqual(len(fig.axes), 1)
+            self.assertFalse(fig.texts)
+            self.assertAlmostEqual(fig.get_figwidth() * 25.4, 150, places=3)
+            self.assertTrue(any(t.get_text().startswith("SmartSim") for t in fig.axes[0].texts))
 
     def test_rendered_dimensions_and_panels(self):
         with tempfile.TemporaryDirectory(dir=plot.ROOT / "tmp") as tmp:
@@ -131,7 +194,8 @@ class SourceAndRenderingTests(unittest.TestCase):
             plot.save(fig, Path(tmp), "comparison", records)
             self.assertEqual(records[0]["panels"], 3)
             self.assertGreater(records[0]["width"], 2000)
-            self.assertGreater(records[0]["height"], 800)
+            self.assertGreater(records[0]["height"], 350)
+            self.assertLess(records[0]["height"], 700)
             self.assertGreater(records[0]["pixel_std"], 8)
 
     def test_generated_manifest_and_full_legend(self):
