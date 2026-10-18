@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.ticker import FuncFormatter, MaxNLocator
-from matplotlib.transforms import Bbox
+from matplotlib.transforms import Bbox, ScaledTranslation
 import numpy as np
 from PIL import Image
 
@@ -384,30 +384,37 @@ def comparison(models, latency, memory, phases, readiness=False):
     return fig
 
 
-def solver_summary(models, latency, memory, phases, phase_only=False, captions=True):
-    count = len(models) if phase_only else 2 * len(models)
+def solver_summary(models, latency, memory, phases, phase_only=False, captions=True, readiness=False):
+    count = len(models) if phase_only or readiness else 2 * len(models)
     caption_band = .28 if captions else 0
-    height = 2.15 + caption_band
+    plot_height = 1.23 * .6
+    label_band = .33 if readiness else .78
+    height = label_band + plot_height + .14 + caption_band
     fig = plt.figure(figsize=(THESIS_WIDTH_IN, height))
     slot = (THESIS_WIDTH_IN - (count - 1) * PANEL_GAP_IN) / count
     axes = []
     for index in range(count):
         start = index * (slot + PANEL_GAP_IN)
         left = .55 if phase_only else .46
-        bottom = .78 + caption_band
+        bottom = label_band + caption_band
         axes.append(fig.add_axes([(start + left) / THESIS_WIDTH_IN, bottom / height,
-                                 (slot - left - .05) / THESIS_WIDTH_IN, 1.23 / height]))
-    if phase_only:
+                                 (slot - left - .05) / THESIS_WIDTH_IN, plot_height / height]))
+    if readiness:
+        for ax, model in zip(axes, models):
+            latency_panel(ax, model, latency, READY)
+            ax.set_xticks(range(len(READY)), config_labels(READY), rotation=0, ha="center")
+            ax.set_ylabel("ML-step time (s)")
+    elif phase_only:
         seconds = [dict(row, mean_ms=row["mean_ms"] / 1000) for row in phases]
         for ax, model in zip(axes, models):
             phase_panel(ax, model, seconds, MAIN, direct_labels=True)
             short = {"Input receive": "Receive", "Output send": "Send",
-                     "Model request": "Request", "Retrieval/unpack": "Get/unpack"}
+                     "Model request": "Run Model", "Retrieval/unpack": "Get/unpack"}
             labels = [short.get(t.get_text(), t.get_text()) for t in ax.get_xticklabels()]
-            ax.set_xticks(ax.get_xticks(), labels, rotation=65, ha="right")
+            ax.set_xticks(ax.get_xticks(), labels, rotation=45, ha="right")
             for text in ax.texts:
                 if text.get_transform() == ax.get_xaxis_transform():
-                    text.set_y(-.44)
+                    text.set_y(-.44 / .6)
             ax.set_ylabel("Phase time (s / rank)")
     else:
         for index, model in enumerate(models):
@@ -415,22 +422,46 @@ def solver_summary(models, latency, memory, phases, phase_only=False, captions=T
             memory_panel(axes[2 * index + 1], model, memory, MAIN)
             for ax in axes[2 * index:2 * index + 2]:
                 ax.set_xticks(range(len(MAIN)), ["AIx", "PhyDLL", "SmartSim default", "SmartSim 1/96", "SmartSim 12/8", "SmartSim 96/1"],
-                              rotation=65, ha="right")
+                              rotation=45, ha="right")
             axes[2 * index].set_ylabel("ML-step time (s)")
     for ax in axes:
-        ax.yaxis.label.set_size(7)
+        ax.yaxis.label.set_size(5.5)
         ax.yaxis.labelpad = 2
         ax.tick_params(axis="both", labelsize=6, length=2, pad=2)
+        ax.tick_params(axis="x", labelsize=4 if readiness else 5)
+        for text in ax.get_xticklabels():
+            if not readiness:
+                text.set_transform(text.get_transform() + ScaledTranslation(3 / 72, 0, fig.dpi_scale_trans))
         ax.yaxis.set_major_locator(MaxNLocator(4))
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:g}"))
         for text in ax.texts:
-            text.set_fontsize(5.5 if phase_only else 6)
             if isinstance(text, matplotlib.text.Annotation):
+                text.set_fontsize(4 if phase_only else 4.5)
                 text.set_rotation(90)
+            else:
+                text.set_fontsize(5.5 if phase_only else 6)
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    for ax in axes:
+        values = [t for t in ax.texts if isinstance(t, matplotlib.text.Annotation)]
+        for text, bar in zip(values, ax.patches):
+            if text.get_window_extent(renderer).y1 > ax.bbox.y1 - 2:
+                if ax.get_ylabel() == "ML-step time (s)":
+                    # Preserve the annotation above the CI cap, not inside its interval.
+                    anchor_y = ax.transData.transform(text.xy)[1]
+                    label_height = text.get_window_extent(renderer).y1 - anchor_y + 3
+                    upper = text.xy[1] / max(.1, 1 - label_height / ax.bbox.height)
+                    ax.set_ylim(0, max(ax.get_ylim()[1], upper))
+                    continue
+                text.xy = (bar.get_x() + bar.get_width() / 2, bar.get_height())
+                text.set_position((0, -2))
+                text.set_verticalalignment("top")
+                red, green, blue, _ = bar.get_facecolor()
+                text.set_color("white" if .2126 * red + .7152 * green + .0722 * blue < .5 else "black")
     if captions:
         for index in range(count):
-            model = models[index if phase_only else index // 2]
-            metric = "Library phases" if phase_only else ("ML-step time", "Memory")[index % 2]
+            model = models[index if phase_only or readiness else index // 2]
+            metric = "ML-step time" if readiness else "Library phases" if phase_only else ("ML-step time", "Memory")[index % 2]
             center = (index * (slot + PANEL_GAP_IN) + slot / 2) / THESIS_WIDTH_IN
             prefix = "" if count == 1 else f"({chr(97 + index)}) "
             fig.text(center, .04 / height,
@@ -439,19 +470,26 @@ def solver_summary(models, latency, memory, phases, phase_only=False, captions=T
     return fig
 
 
-def save(fig, output, name, records, native=False, bbox=None, close=True):
+def save(fig, output, name, records, native=False, bbox=None, close=True, pgf=False):
     path = output / name
     path.parent.mkdir(parents=True, exist_ok=True)
     bounds = bbox if bbox is not None else None if native else "tight"
     fig.savefig(path.with_suffix(".png"), bbox_inches=bounds, pad_inches=0 if native else .12)
     fig.savefig(path.with_suffix(".pdf"), bbox_inches=bounds, pad_inches=0 if native else .12)
+    if pgf:
+        if fig.texts:
+            raise ValueError("PGF panel exports must not contain figure captions")
+        with plt.rc_context({"pgf.texsystem": "pdflatex", "pgf.rcfonts": False,
+                             "pgf.preamble": r"\usepackage[T1]{fontenc}\usepackage{lmodern}"}):
+            fig.savefig(path.with_suffix(".pgf"), bbox_inches=bounds, pad_inches=0)
     with Image.open(path.with_suffix(".png")) as image:
         width, height = image.size
         variation = float(np.asarray(image.convert("RGB")).std())
-    if width < (200 if native else 1000) or height < (300 if native else 350) or variation < 8 or path.with_suffix(".pdf").stat().st_size < 1000:
+    if width < (200 if native else 1000) or height < (200 if native else 350) or variation < 8 or path.with_suffix(".pdf").stat().st_size < 1000:
         raise ValueError(f"Invalid rendered image {name}")
     records.append({"name": name, "panels": 1 if bbox is not None else len(fig.axes), "width": width, "height": height,
                     "native_width_mm": (bbox.width if bbox is not None else fig.get_figwidth()) * 25.4 if native else None,
+                    "pgf": pgf,
                     "pixel_std": variation, "pdf_bytes": path.with_suffix(".pdf").stat().st_size})
     if close:
         plt.close(fig)
@@ -543,13 +581,13 @@ def main():
             model = models[index // 2]
             metric = ("latency", "memory")[index % 2]
             bbox = Bbox.from_bounds(index * (slot + PANEL_GAP_IN), 0, slot, fig.get_figheight())
-            save(fig, output, f"solver/panels/{model}_{metric}", records, native=True, bbox=bbox, close=False)
+            save(fig, output, f"solver/panels/{model}_{metric}", records, native=True, bbox=bbox, close=False, pgf=True)
         plt.close(fig)
         for model in models:
             for captions in (True, False):
                 fig = solver_summary([model], latency, memory, phases, phase_only=True, captions=captions)
                 folder = "solver" if captions else "solver/panels"
-                save(fig, output, f"{folder}/{model}_phases", records, native=True)
+                save(fig, output, f"{folder}/{model}_phases", records, native=True, pgf=not captions)
         # Remove only the superseded generated two-model phase previews.
         for suffix in ("png", "pdf"):
             (output / f"solver/{solver}_phases.{suffix}").unlink(missing_ok=True)
@@ -569,6 +607,14 @@ def main():
                             wspace=.28, hspace=.55)
         folder = "readiness" if kind.startswith("readiness") else "alternatives"
         save(fig, output, f"{folder}/{kind}_2x2", records)
+    fig = solver_summary(MODELS, latency, memory, phases, readiness=True)
+    save(fig, output, "readiness/readiness_latency_1x4", records, native=True)
+    fig = solver_summary(MODELS, latency, memory, phases, readiness=True, captions=False)
+    slot = (THESIS_WIDTH_IN - 3 * PANEL_GAP_IN) / 4
+    for index, model in enumerate(MODELS):
+        bbox = Bbox.from_bounds(index * (slot + PANEL_GAP_IN), 0, slot, fig.get_figheight())
+        save(fig, output, f"readiness/panels/{model}_latency", records, native=True, bbox=bbox, close=False, pgf=True)
+    plt.close(fig)
     if args.preprocessing:
         fig, axes = plt.subplots(1, 2, figsize=(12.5, 2.8))
         for ax, model in zip(axes, MODELS[2:]):
@@ -591,15 +637,18 @@ def main():
                 "t_95_df4": T95, "latency_rows": len(latency), "phase_rows": len(phases),
                 "phase_unavailable_rows": sum(r["status"] != "recorded" for r in phases)}
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    links = "\n".join(f"- `{r['name']}`: [PNG]({r['name']}.png) | [PDF]({r['name']}.pdf)" for r in records)
+    links = "\n".join(f"- `{r['name']}`: [PNG]({r['name']}.png) | [PDF]({r['name']}.pdf)"
+                      + (f" | [PGF]({r['name']}.pgf)" if r["pgf"] else "") for r in records)
     command = "/hpcwork/ro092286/smartsim/CPP-ML-Interface/extern/python/smartsim_cuda-12/bin/python3 plot_cpu_comparison.py"
     flags = " --preprocessing" if args.preprocessing else ""
     (output / "README.md").write_text("# CPU Figure Index\n\nRegenerate from cpu_benchmark:\n\n`" + command + flags + "`\n\n"
         "Prefer main per-model triptychs for detail, solver overviews for compact comparison.\n"
         "The solver/ folder offers captioned four-panel time/memory rows and four full-width model-specific phase figures.\n"
         "Solver previews are natively 150 mm wide (thesis text width); solver/panels/ contains caption-free individual PDFs/PNGs.\n"
+        "All standalone solver/panels/ and readiness/panels/ exports also have caption-free PGFs, intended for LaTeX's own subcaptions.\n"
+        "PGFs use the pgf package and Latin Modern with T1 encoding; no thesis integration is generated.\n"
         "Time/memory panel widths are 36 mm, allowing 2 mm gaps; individual phase panels are 150 mm wide.\n"
-        "Numeric configuration pairs are TPQ/INTRA; Receive/Send are DL-side, Request is client elapsed time.\n"
+        "Numeric configuration pairs are TPQ/INTRA; Receive/Send are DL-side, Run Model is client elapsed time.\n"
         "Alternatives offer four-model latency, memory and full-legend phase layouts.\n"
         "Readiness is a separate comparison, not a seventh main provider.\n\n" + links + "\n\n" + NOTES
         + "\n## Audit Files\n\n[Manifest and source SHA256](manifest.json), [latency](data/latency.csv), "

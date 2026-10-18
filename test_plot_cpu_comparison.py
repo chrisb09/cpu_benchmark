@@ -186,6 +186,21 @@ class SourceAndRenderingTests(unittest.TestCase):
             self.assertFalse(fig.texts)
             self.assertAlmostEqual(fig.get_figwidth() * 25.4, 150, places=3)
             self.assertTrue(any(t.get_text().startswith("SmartSim") for t in fig.axes[0].texts))
+            ax = fig.axes[0]
+            self.assertIn("Run Model", [t.get_text() for t in ax.get_xticklabels()])
+            self.assertTrue(all(t.get_fontsize() == 5 for t in ax.get_xticklabels()))
+            self.assertTrue(all(t.get_rotation() == 45 for t in ax.get_xticklabels()))
+            self.assertAlmostEqual(ax.get_position().height * fig.get_figheight(), 1.23 * .6)
+            self.assertEqual(ax.yaxis.label.get_fontsize(), 5.5)
+            values = [t for t in ax.texts if isinstance(t, plot.matplotlib.text.Annotation)]
+            self.assertTrue(all(t.get_fontsize() == 4 and t.get_rotation() == 90 for t in values))
+            self.assertTrue(all(t.get_position()[0] == 0 for t in values))
+            fig.canvas.draw()
+            renderer = fig.canvas.get_renderer()
+            rotated_bottom = min(t.get_window_extent(renderer).y0 for t in ax.get_xticklabels())
+            groups = [t for t in ax.texts if t.get_transform() == ax.get_xaxis_transform()]
+            horizontal_top = max(t.get_window_extent(renderer).y1 for t in groups)
+            self.assertGreater(rotated_bottom - horizontal_top, fig.dpi / 72)
 
     def test_rendered_dimensions_and_panels(self):
         with tempfile.TemporaryDirectory(dir=plot.ROOT / "tmp") as tmp:
@@ -198,6 +213,30 @@ class SourceAndRenderingTests(unittest.TestCase):
             self.assertLess(records[0]["height"], 700)
             self.assertGreater(records[0]["pixel_std"], 8)
 
+    def test_readiness_single_row(self):
+        fig = plot.solver_summary(plot.MODELS, self.latency, self.memory, self.phases, readiness=True)
+        self.assertEqual(len(fig.axes), 4)
+        self.assertAlmostEqual(fig.get_figwidth() * 25.4, 150, places=3)
+        self.assertEqual(len(fig.texts), 4)
+        for ax, model in zip(fig.axes, plot.MODELS):
+            self.assertEqual(len(ax.patches), 3)
+            self.assertEqual([t.get_text() for t in ax.get_xticklabels()], plot.config_labels(plot.READY))
+            self.assertTrue(all(t.get_rotation() == 0 and t.get_fontsize() == 4
+                                and t.get_horizontalalignment() == "center" for t in ax.get_xticklabels()))
+            expected = [next(r["mean_ms"] / 1000 for r in self.latency
+                             if (r["model"], r["variant"]) == (model, variant)) for variant in plot.READY]
+            self.assertEqual([p.get_height() for p in ax.patches], expected)
+            values = [t for t in ax.texts if isinstance(t, plot.matplotlib.text.Annotation)]
+            for text, variant in zip(values, plot.READY):
+                row = next(r for r in self.latency if (r["model"], r["variant"]) == (model, variant))
+                self.assertAlmostEqual(text.xy[1], (row["mean_ms"] + row["ci_half_ms"]) / 1000)
+                self.assertEqual(text.get_verticalalignment(), "bottom")
+                self.assertGreater(text.get_position()[1], 0)
+        standalone = plot.solver_summary(plot.MODELS, self.latency, self.memory, self.phases,
+                                          readiness=True, captions=False)
+        self.assertFalse(standalone.texts)
+        self.assertAlmostEqual(standalone.axes[0].get_position().y0 * standalone.get_figheight(), .33)
+
     def test_generated_manifest_and_full_legend(self):
         manifest = json.loads((plot.OUTPUT / "manifest.json").read_text())
         self.assertGreaterEqual(len(manifest["figures"]), 14)
@@ -206,6 +245,12 @@ class SourceAndRenderingTests(unittest.TestCase):
         for record in manifest["figures"]:
             self.assertTrue((plot.OUTPUT / (record["name"] + ".png")).is_file())
             self.assertTrue((plot.OUTPUT / (record["name"] + ".pdf")).is_file())
+            if record.get("pgf"):
+                pgf = (plot.OUTPUT / (record["name"] + ".pgf")).read_text()
+                self.assertIn(r"\begin{pgfpicture}", pgf)
+                self.assertNotIn("[TS]", pgf)
+                self.assertNotIn("[TBL]", pgf)
+                self.assertNotIn("(a)", pgf)
         fig = plt.figure()
         plot.phase_legend(fig, full=True)
         self.assertEqual({t.get_text() for t in fig.legends[0].get_texts()}, set(plot.FULL_LEGEND.values()))
