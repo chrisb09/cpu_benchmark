@@ -153,8 +153,7 @@ class SourceAndRenderingTests(unittest.TestCase):
             self.assertEqual(len(fig.axes), 2)
             for ax in fig.axes:
                 self.assertEqual(len({round(p.get_width(), 8) for p in ax.patches}), 1)
-                self.assertIn("Forward", [t.get_text() for t in ax.get_xticklabels()])
-                self.assertTrue(any(t.get_text() == "AIx" for t in ax.texts))
+                self.assertIn("AIx", [t.get_text() for t in ax.get_xticklabels()])
                 self.assertEqual(ax.get_ylabel(), "Phase time (s / rank)")
 
     def test_native_panel_export_dimensions(self):
@@ -176,7 +175,16 @@ class SourceAndRenderingTests(unittest.TestCase):
         self.assertEqual(len(fig.texts), 4)
         self.assertTrue(fig.texts[0].get_text().startswith("(a) [TS]"))
         self.assertTrue(fig.texts[-1].get_text().startswith("(d) [TS]"))
-        self.assertIn("SmartSim default", [t.get_text() for t in fig.axes[0].get_xticklabels()])
+        self.assertFalse(fig.axes[0].get_xticklabels())
+        self.assertEqual(len(fig.legends[0].get_texts()), len(plot.MAIN))
+        self.assertEqual(fig.axes[0].yaxis.label.get_fontsize(), 7.5)
+        self.assertEqual(fig.axes[0].get_yticklabels()[0].get_fontsize(), 8)
+        self.assertTrue(all(t.get_position()[0] == 0 for ax in fig.axes for t in ax.texts
+                            if isinstance(t, plot.matplotlib.text.Annotation)))
+        fig.canvas.draw()
+        legend_bottom = fig.legends[0].get_window_extent(fig.canvas.get_renderer()).y0
+        self.assertGreater(legend_bottom, max(ax.bbox.y1 for ax in fig.axes))
+        self.assertLess(legend_bottom - max(ax.bbox.y1 for ax in fig.axes), fig.dpi * .06)
         standalone = plot.solver_summary(plot.MODELS[:2], self.latency, self.memory, self.phases, captions=False)
         self.assertFalse(standalone.texts)
         for model in plot.MODELS:
@@ -185,22 +193,34 @@ class SourceAndRenderingTests(unittest.TestCase):
             self.assertEqual(len(fig.axes), 1)
             self.assertFalse(fig.texts)
             self.assertAlmostEqual(fig.get_figwidth() * 25.4, 150, places=3)
-            self.assertTrue(any(t.get_text().startswith("SmartSim") for t in fig.axes[0].texts))
             ax = fig.axes[0]
-            self.assertIn("Run Model", [t.get_text() for t in ax.get_xticklabels()])
-            self.assertTrue(all(t.get_fontsize() == 5 for t in ax.get_xticklabels()))
-            self.assertTrue(all(t.get_rotation() == 45 for t in ax.get_xticklabels()))
-            self.assertAlmostEqual(ax.get_position().height * fig.get_figheight(), 1.23 * .6)
-            self.assertEqual(ax.yaxis.label.get_fontsize(), 5.5)
+            phase_order = ["Inference", *plot.DL_NODES, *list(plot.SS_BINS) * 4]
+            self.assertEqual([p.get_facecolor() for p in ax.patches],
+                             [plot.matplotlib.colors.to_rgba(plot.COLORS[p]) for p in phase_order])
+            self.assertIn("SmartSim\n96/1", [t.get_text() for t in ax.get_xticklabels()])
+            self.assertTrue(all(t.get_fontsize() == 8.5 for t in ax.get_xticklabels()))
+            self.assertTrue(all(t.get_rotation() == 0 for t in ax.get_xticklabels()))
+            self.assertAlmostEqual(ax.get_position().height * fig.get_figheight(), 1.05)
+            self.assertEqual(ax.yaxis.label.get_fontsize(), 8.5)
+            self.assertEqual(ax.get_yticklabels()[0].get_fontsize(), 10)
             values = [t for t in ax.texts if isinstance(t, plot.matplotlib.text.Annotation)]
-            self.assertTrue(all(t.get_fontsize() == 4 and t.get_rotation() == 90 for t in values))
+            self.assertTrue(all(t.get_fontsize() == 7 and t.get_rotation() == 90 for t in values))
             self.assertTrue(all(t.get_position()[0] == 0 for t in values))
+            self.assertEqual([t.get_text() for t in values],
+                             ["0.0" if round(p.get_height(), 2) == 0 else f"{p.get_height():,.2f}"
+                              for p in ax.patches])
+            if model == "watercnn":
+                self.assertIn("0.02", [t.get_text() for t in values])
+                self.assertIn("0.0", [t.get_text() for t in values])
+            note = next(t for t in ax.texts if t.get_text().startswith("PhyDLL Column Order:"))
+            self.assertIn("SmartSim Column Order: Put, Run Model, Unpack, Other", note.get_text())
+            self.assertEqual(note.get_fontsize(), 6)
+            self.assertEqual(note.get_color(), "#777777")
             fig.canvas.draw()
             renderer = fig.canvas.get_renderer()
-            rotated_bottom = min(t.get_window_extent(renderer).y0 for t in ax.get_xticklabels())
-            groups = [t for t in ax.texts if t.get_transform() == ax.get_xaxis_transform()]
-            horizontal_top = max(t.get_window_extent(renderer).y1 for t in groups)
-            self.assertGreater(rotated_bottom - horizontal_top, fig.dpi / 72)
+            self.assertGreaterEqual(note.get_window_extent(renderer).y0, 0)
+            self.assertLess(note.get_window_extent(renderer).y1,
+                            min(t.get_window_extent(renderer).y0 for t in ax.get_xticklabels()))
 
     def test_rendered_dimensions_and_panels(self):
         with tempfile.TemporaryDirectory(dir=plot.ROOT / "tmp") as tmp:
@@ -213,29 +233,77 @@ class SourceAndRenderingTests(unittest.TestCase):
             self.assertLess(records[0]["height"], 700)
             self.assertGreater(records[0]["pixel_std"], 8)
 
-    def test_readiness_single_row(self):
+    def test_readiness_four_panel_phydll_only_row(self):
         fig = plot.solver_summary(plot.MODELS, self.latency, self.memory, self.phases, readiness=True)
         self.assertEqual(len(fig.axes), 4)
         self.assertAlmostEqual(fig.get_figwidth() * 25.4, 150, places=3)
         self.assertEqual(len(fig.texts), 4)
+        self.assertAlmostEqual((fig.get_figwidth() - 3 * plot.PANEL_GAP_IN) / 4 * 25.4, 36, places=3)
+        self.assertEqual([t.get_text() for t in fig.legends[0].get_texts()],
+                         ["PhyDLL default", "PhyDLL readiness"])
         for ax, model in zip(fig.axes, plot.MODELS):
-            self.assertEqual(len(ax.patches), 3)
-            self.assertEqual([t.get_text() for t in ax.get_xticklabels()], plot.config_labels(plot.READY))
-            self.assertTrue(all(t.get_rotation() == 0 and t.get_fontsize() == 4
-                                and t.get_horizontalalignment() == "center" for t in ax.get_xticklabels()))
+            self.assertEqual(len(ax.patches), 2)
+            left, right = ax.patches
+            gap = right.get_x() - (left.get_x() + left.get_width())
+            side = left.get_x() - ax.get_xlim()[0]
+            self.assertAlmostEqual(gap, .2)
+            self.assertGreater(side, gap)
+            self.assertFalse(ax.get_xticklabels())
             expected = [next(r["mean_ms"] / 1000 for r in self.latency
-                             if (r["model"], r["variant"]) == (model, variant)) for variant in plot.READY]
+                             if (r["model"], r["variant"]) == (model, variant)) for variant in plot.READY[1:]]
             self.assertEqual([p.get_height() for p in ax.patches], expected)
             values = [t for t in ax.texts if isinstance(t, plot.matplotlib.text.Annotation)]
-            for text, variant in zip(values, plot.READY):
+            for text, variant in zip(values, plot.READY[1:]):
                 row = next(r for r in self.latency if (r["model"], r["variant"]) == (model, variant))
                 self.assertAlmostEqual(text.xy[1], (row["mean_ms"] + row["ci_half_ms"]) / 1000)
                 self.assertEqual(text.get_verticalalignment(), "bottom")
                 self.assertGreater(text.get_position()[1], 0)
-        standalone = plot.solver_summary(plot.MODELS, self.latency, self.memory, self.phases,
+                self.assertEqual(text.get_fontsize(), 8)
+                self.assertEqual(text.get_rotation(), 0)
+        standalone = plot.solver_summary(plot.MODELS[:2], self.latency, self.memory, self.phases,
                                           readiness=True, captions=False)
         self.assertFalse(standalone.texts)
-        self.assertAlmostEqual(standalone.axes[0].get_position().y0 * standalone.get_figheight(), .33)
+        self.assertAlmostEqual(standalone.axes[0].get_position().y0 * standalone.get_figheight(), .08)
+
+    def test_shared_legends_fit_and_explain_colors(self):
+        for phase_only, readiness, height in ((False, False, .26), (True, False, .44), (False, True, .24)):
+            fig = plt.figure(figsize=(plot.THESIS_WIDTH_IN, height))
+            legend = plot.summary_legend(fig, phase_only=phase_only, readiness=readiness)
+            fig.canvas.draw()
+            bounds = legend.get_window_extent(fig.canvas.get_renderer())
+            self.assertGreaterEqual(bounds.x0, 0)
+            self.assertGreaterEqual(bounds.y0, 0)
+            self.assertLessEqual(bounds.x1, fig.bbox.x1)
+            self.assertLessEqual(bounds.y1, fig.bbox.y1)
+            self.assertEqual(len(legend.get_texts()), 8 if phase_only else 2 if readiness else 6)
+            rows = {round(t.get_window_extent(fig.canvas.get_renderer()).y0, 1) for t in legend.get_texts()}
+            self.assertEqual(len(rows), 2 if phase_only else 1)
+            if phase_only:
+                self.assertTrue(all(t.get_fontsize() == 7.5 for t in legend.get_texts()))
+                self.assertIn("AIx library call", [t.get_text() for t in legend.get_texts()])
+                self.assertIn("Run Model (client)", [t.get_text() for t in legend.get_texts()])
+                self.assertIn("Receive (ML-side)", [t.get_text() for t in legend.get_texts()])
+                self.assertFalse(any("(DL)" in t.get_text() for t in legend.get_texts()))
+                groups = [a for a in fig.artists if isinstance(a, plot.FancyBboxPatch)]
+                self.assertEqual(len(groups), 2)
+                for box, indices in zip(groups, ((2, 4, 6), (3, 5, 7))):
+                    self.assertEqual(box.get_linestyle(), ":")
+                    bounds = box.get_window_extent(fig.canvas.get_renderer())
+                    self.assertGreaterEqual(bounds.x0, 0)
+                    self.assertGreaterEqual(bounds.y0, 0)
+                    self.assertLessEqual(bounds.x1, fig.bbox.x1)
+                    self.assertLessEqual(bounds.y1, fig.bbox.y1)
+                    self.assertTrue(all(bounds.contains(*t.get_window_extent(fig.canvas.get_renderer()).get_points().mean(axis=0))
+                                        for i, t in enumerate(legend.get_texts()) if i in indices))
+                legend.get_texts()[0].set_text("AIx inclusive library call")
+                fig.canvas.draw()
+                renderer = fig.canvas.get_renderer()
+                self.assertAlmostEqual(groups[0].get_window_extent(renderer).x0,
+                                       legend.legend_handles[2].get_window_extent(renderer).x0 - .025 * fig.dpi)
+            else:
+                expected = [plot.matplotlib.colors.to_rgba(plot.PROVIDER_COLORS[v])
+                            for v in (plot.READY[1:] if readiness else plot.MAIN)]
+                self.assertEqual([p.get_facecolor() for p in legend.get_patches()], expected)
 
     def test_generated_manifest_and_full_legend(self):
         manifest = json.loads((plot.OUTPUT / "manifest.json").read_text())
@@ -251,6 +319,11 @@ class SourceAndRenderingTests(unittest.TestCase):
                 self.assertNotIn("[TS]", pgf)
                 self.assertNotIn("[TBL]", pgf)
                 self.assertNotIn("(a)", pgf)
+                if record["name"].endswith("_memory"):
+                    self.assertNotIn("ML-step time", pgf)
+                elif record["name"].endswith("_latency"):
+                    self.assertNotIn("Peak memory", pgf)
+                    self.assertEqual(pgf.count("ML-step time"), 1)
         fig = plt.figure()
         plot.phase_legend(fig, full=True)
         self.assertEqual({t.get_text() for t in fig.legends[0].get_texts()}, set(plot.FULL_LEGEND.values()))

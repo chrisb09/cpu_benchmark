@@ -9,9 +9,9 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
+from matplotlib.patches import FancyBboxPatch, Patch
 from matplotlib.ticker import FuncFormatter, MaxNLocator
-from matplotlib.transforms import Bbox, ScaledTranslation
+from matplotlib.transforms import Bbox
 import numpy as np
 from PIL import Image
 
@@ -384,62 +384,116 @@ def comparison(models, latency, memory, phases, readiness=False):
     return fig
 
 
+def summary_legend(fig, phase_only=False, readiness=False, y=0):
+    if phase_only:
+        # Legends fill columns first: each library's three phases occupy one row.
+        labels = {"Inference": "AIx library call", "Other": "Other",
+                  "Input receive": "Receive (ML-side)", "Put": "Put (client)",
+                  "Forward": "Forward (ML-side)", "Model request": "Run Model (client)",
+                  "Output send": "Send (ML-side)", "Retrieval/unpack": "Get/unpack (client)"}
+        handles = [Patch(facecolor=COLORS[k], edgecolor="#444444", linewidth=.4, label=v)
+                   for k, v in labels.items()]
+    else:
+        labels = {"AIX": "AIx", "blocking": "PhyDLL default" if readiness else "PhyDLL",
+                  "readiness": "PhyDLL readiness", "SS_DEFAULT": "SmartSim default",
+                  "SS_TPQ1_I96_B96": "SmartSim 1/96", "SS_TPQ12_I8_B96": "SmartSim 12/8",
+                  "SS_TPQ96_I1_B96": "SmartSim 96/1"}
+        handles = [Patch(facecolor=PROVIDER_COLORS[k], edgecolor="#444444", linewidth=.4, label=labels[k])
+                   for k in (READY[1:] if readiness else MAIN)]
+    legend = fig.legend(handles=handles, loc="lower center", ncol=4 if phase_only else 2 if readiness else 6,
+                        frameon=False, fontsize=8.5 if readiness else 7.5,
+                        bbox_to_anchor=(.5, y + (.035 / fig.get_figheight() if phase_only else 0)),
+                        borderaxespad=0, handlelength=1.1, handletextpad=.4,
+                        columnspacing=.4 if phase_only else .9)
+    if phase_only:
+        class GroupBox(FancyBboxPatch):
+            def __init__(self, indices):
+                self.indices = indices
+                super().__init__((0, 0), 0, 0, boxstyle="round,pad=0,rounding_size=0.008",
+                                 mutation_aspect=fig.get_figwidth() / fig.get_figheight(),
+                                 transform=fig.transFigure, facecolor="none", edgecolor="#666666",
+                                 linewidth=.7, linestyle=":", clip_on=False, zorder=6)
+
+            def draw(self, renderer):
+                # The legend must lay itself out first using this backend's font metrics.
+                bounds = Bbox.union([artist.get_window_extent(renderer)
+                                     for i in self.indices
+                                     for artist in (legend.legend_handles[i], legend.get_texts()[i])])
+                bounds = bounds.transformed(fig.transFigure.inverted())
+                px, py = .025 / fig.get_figwidth(), .025 / fig.get_figheight()
+                self.set_bounds(bounds.x0 - px, bounds.y0 - py,
+                                bounds.width + 2 * px, bounds.height + 2 * py)
+                super().draw(renderer)
+
+        for indices in ((2, 4, 6), (3, 5, 7)):
+            fig.add_artist(GroupBox(indices))
+    return legend
+
+
 def solver_summary(models, latency, memory, phases, phase_only=False, captions=True, readiness=False):
     count = len(models) if phase_only or readiness else 2 * len(models)
     caption_band = .28 if captions else 0
-    plot_height = 1.23 * .6
-    label_band = .33 if readiness else .78
-    height = label_band + plot_height + .14 + caption_band
+    legend_band = (.24 if readiness else .44 if phase_only else .26) if captions else 0
+    plot_height = 1.05 if readiness or phase_only else .9
+    label_band = .56 if phase_only else .08
+    height = label_band + plot_height + .07 + caption_band + legend_band
     fig = plt.figure(figsize=(THESIS_WIDTH_IN, height))
     slot = (THESIS_WIDTH_IN - (count - 1) * PANEL_GAP_IN) / count
     axes = []
     for index in range(count):
         start = index * (slot + PANEL_GAP_IN)
-        left = .55 if phase_only else .46
+        left = .65 if phase_only else .49 if not readiness else .46
         bottom = label_band + caption_band
         axes.append(fig.add_axes([(start + left) / THESIS_WIDTH_IN, bottom / height,
                                  (slot - left - .05) / THESIS_WIDTH_IN, plot_height / height]))
     if readiness:
         for ax, model in zip(axes, models):
-            latency_panel(ax, model, latency, READY)
-            ax.set_xticks(range(len(READY)), config_labels(READY), rotation=0, ha="center")
+            latency_panel(ax, model, latency, READY[1:])
+            for bar in ax.patches:
+                center = bar.get_x() + bar.get_width() / 2
+                bar.set_width(.8)
+                bar.set_x(center - .4)
+            ax.set_xlim(-.8, 1.8)
+            ax.set_xticks([])
             ax.set_ylabel("ML-step time (s)")
     elif phase_only:
         seconds = [dict(row, mean_ms=row["mean_ms"] / 1000) for row in phases]
         for ax, model in zip(axes, models):
-            phase_panel(ax, model, seconds, MAIN, direct_labels=True)
-            short = {"Input receive": "Receive", "Output send": "Send",
-                     "Model request": "Run Model", "Retrieval/unpack": "Get/unpack"}
-            labels = [short.get(t.get_text(), t.get_text()) for t in ax.get_xticklabels()]
-            ax.set_xticks(ax.get_xticks(), labels, rotation=45, ha="right")
-            for text in ax.texts:
-                if text.get_transform() == ax.get_xaxis_transform():
-                    text.set_y(-.44 / .6)
+            phase_panel(ax, model, seconds, MAIN)
+            ax.set_xticks(range(len(MAIN)), ["AIx", "PhyDLL", "SmartSim\ndefault",
+                                            "SmartSim\n1/96", "SmartSim\n12/8", "SmartSim\n96/1"])
+            for x in range(len(MAIN) - 1):
+                ax.axvline(x + .5, color="#dddddd", linewidth=.6)
             ax.set_ylabel("Phase time (s / rank)")
     else:
         for index, model in enumerate(models):
             latency_panel(axes[2 * index], model, latency, MAIN)
             memory_panel(axes[2 * index + 1], model, memory, MAIN)
             for ax in axes[2 * index:2 * index + 2]:
-                ax.set_xticks(range(len(MAIN)), ["AIx", "PhyDLL", "SmartSim default", "SmartSim 1/96", "SmartSim 12/8", "SmartSim 96/1"],
-                              rotation=45, ha="right")
+                ax.set_xticks([])
             axes[2 * index].set_ylabel("ML-step time (s)")
     for ax in axes:
-        ax.yaxis.label.set_size(5.5)
+        ax.yaxis.label.set_size(9 if readiness else 8.5 if phase_only else 7.5)
         ax.yaxis.labelpad = 2
-        ax.tick_params(axis="both", labelsize=6, length=2, pad=2)
-        ax.tick_params(axis="x", labelsize=4 if readiness else 5)
-        for text in ax.get_xticklabels():
-            if not readiness:
-                text.set_transform(text.get_transform() + ScaledTranslation(3 / 72, 0, fig.dpi_scale_trans))
+        ax.tick_params(axis="both", labelsize=10 if phase_only else 9 if readiness else 8, length=2, pad=2)
+        ax.tick_params(axis="x", labelsize=8.5 if phase_only else 6.5)
         ax.yaxis.set_major_locator(MaxNLocator(4))
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:g}"))
         for text in ax.texts:
             if isinstance(text, matplotlib.text.Annotation):
-                text.set_fontsize(4 if phase_only else 4.5)
-                text.set_rotation(90)
+                text.set_fontsize(8 if readiness else 7 if phase_only else 5.5)
+                text.set_rotation(0 if readiness else 90)
+                if phase_only:
+                    value = text.xy[1]
+                    text.set_text("0.0" if round(value, 2) == 0 else f"{value:,.2f}")
             else:
-                text.set_fontsize(5.5 if phase_only else 6)
+                text.set_fontsize(8.5 if phase_only else 7)
+        if phase_only:
+            ax.text(0, -(label_band - .015) / plot_height,
+                    "PhyDLL Column Order: Receive, Forward, Send, Other\n"
+                    "SmartSim Column Order: Put, Run Model, Unpack, Other",
+                    transform=ax.transAxes, ha="left", va="bottom", fontsize=6,
+                    color="#777777", linespacing=1.05, clip_on=False)
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     for ax in axes:
@@ -466,7 +520,9 @@ def solver_summary(models, latency, memory, phases, phase_only=False, captions=T
             prefix = "" if count == 1 else f"({chr(97 + index)}) "
             fig.text(center, .04 / height,
                      f"{prefix}{MODEL_LABELS[model]}\n{metric}",
-                     ha="center", va="bottom", fontsize=6.5)
+                     ha="center", va="bottom", fontsize=8.5 if readiness else 7.5)
+        summary_legend(fig, phase_only=phase_only, readiness=readiness,
+                       y=(bottom + plot_height + .04) / height)
     return fig
 
 
@@ -485,7 +541,7 @@ def save(fig, output, name, records, native=False, bbox=None, close=True, pgf=Fa
     with Image.open(path.with_suffix(".png")) as image:
         width, height = image.size
         variation = float(np.asarray(image.convert("RGB")).std())
-    if width < (200 if native else 1000) or height < (200 if native else 350) or variation < 8 or path.with_suffix(".pdf").stat().st_size < 1000:
+    if width < (200 if native else 1000) or height < (30 if not fig.axes else 150 if native else 350) or variation < 8 or path.with_suffix(".pdf").stat().st_size < 1000:
         raise ValueError(f"Invalid rendered image {name}")
     records.append({"name": name, "panels": 1 if bbox is not None else len(fig.axes), "width": width, "height": height,
                     "native_width_mm": (bbox.width if bbox is not None else fig.get_figwidth()) * 25.4 if native else None,
@@ -504,7 +560,8 @@ def write_csv(path, rows):
 
 NOTES = """## Measurement Notes
 
-Main figures exclude readiness; readiness figures compare AIx reference with blocking and readiness.
+Main figures exclude readiness. Native readiness panels compare only blocking and readiness;
+the detailed readiness triptychs retain AIx as a reference.
 All axes are linear, with independent subplot scales. Numeric labels are means or maxima, not medians.
 Latency whiskers are 95% t CIs over five independent run means, t=2.776445, df=4.
 Terrain run means use ten steady calls each; MAIA run means use five steady calls each
@@ -567,6 +624,12 @@ def main():
                        ("region_counts", audit), ("preprocessing", preprocessing)):
         write_csv(output / "data" / (name + ".csv"), rows)
     records = []
+    for name, phase_only, readiness, height in (("solver/configuration_legend", False, False, .26),
+                                               ("solver/phase_legend", True, False, .44),
+                                               ("readiness/configuration_legend", False, True, .24)):
+        fig = plt.figure(figsize=(THESIS_WIDTH_IN, height))
+        summary_legend(fig, phase_only=phase_only, readiness=readiness)
+        save(fig, output, name, records, native=True, pgf=True)
     for model in MODELS:
         save(comparison([model], latency, memory, phases), output, f"main/{model}_comparison", records)
         save(comparison([model], latency, memory, phases, True), output, f"readiness/{model}_comparison", records)
@@ -578,6 +641,9 @@ def main():
         count = len(fig.axes)
         slot = (THESIS_WIDTH_IN - (count - 1) * PANEL_GAP_IN) / count
         for index in range(count):
+            # PGF does not clip off-panel artists to the cropped page boundary.
+            for axis_index, ax in enumerate(fig.axes):
+                ax.set_visible(axis_index == index)
             model = models[index // 2]
             metric = ("latency", "memory")[index % 2]
             bbox = Bbox.from_bounds(index * (slot + PANEL_GAP_IN), 0, slot, fig.get_figheight())
@@ -612,9 +678,14 @@ def main():
     fig = solver_summary(MODELS, latency, memory, phases, readiness=True, captions=False)
     slot = (THESIS_WIDTH_IN - 3 * PANEL_GAP_IN) / 4
     for index, model in enumerate(MODELS):
+        for axis_index, ax in enumerate(fig.axes):
+            ax.set_visible(axis_index == index)
         bbox = Bbox.from_bounds(index * (slot + PANEL_GAP_IN), 0, slot, fig.get_figheight())
         save(fig, output, f"readiness/panels/{model}_latency", records, native=True, bbox=bbox, close=False, pgf=True)
     plt.close(fig)
+    for solver in ("terrain", "maia"):
+        for suffix in ("png", "pdf"):
+            (output / f"readiness/{solver}_latency_1x2.{suffix}").unlink(missing_ok=True)
     if args.preprocessing:
         fig, axes = plt.subplots(1, 2, figsize=(12.5, 2.8))
         for ax, model in zip(axes, MODELS[2:]):
@@ -648,6 +719,8 @@ def main():
         "All standalone solver/panels/ and readiness/panels/ exports also have caption-free PGFs, intended for LaTeX's own subcaptions.\n"
         "PGFs use the pgf package and Latin Modern with T1 encoding; no thesis integration is generated.\n"
         "Time/memory panel widths are 36 mm, allowing 2 mm gaps; individual phase panels are 150 mm wide.\n"
+        "Readiness uses four 36 mm PhyDLL-only panels in one row. Shared legends sit above the native plots.\n"
+        "Time/memory and readiness omit repeated x labels; color legends identify configurations. Phase colors identify scopes.\n"
         "Numeric configuration pairs are TPQ/INTRA; Receive/Send are DL-side, Run Model is client elapsed time.\n"
         "Alternatives offer four-model latency, memory and full-legend phase layouts.\n"
         "Readiness is a separate comparison, not a seventh main provider.\n\n" + links + "\n\n" + NOTES

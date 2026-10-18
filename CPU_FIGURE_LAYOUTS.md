@@ -32,21 +32,17 @@ reprofiled and is no longer a figure model.
 - `readiness/*_comparison`: four separate triptychs; AIx reference in latency and
   memory, blocking/readiness pairs within each of four DL phase groups.
 - `readiness/readiness_latency_2x2`: compact latency-only readiness alternative.
-- `readiness/readiness_latency_1x4`: all four model latency panels in one 150 mm
-  row, comparing AIx, PhyDLL default and readiness with (a)-(d) subcaptions.
-  Configuration labels are horizontal and centered, at 4pt to avoid overlap.
-  Its bottom label band is 0.33 inches, keeping subcaptions close to the labels.
+- `readiness/readiness_latency_1x4`: thesis readiness layout with four 36 mm
+  model panels, showing only PhyDLL default and readiness, without AIx.
   Caption-free 36 mm panels are exported under `readiness/panels/`.
 - `supplement/preprocessing`: optional extraction/reconstruction regions, not
   an inferred whole preprocessing/postprocessing breakdown.
 - `solver/{terrain,maia}_time_memory`: four panels in one row, ordered as
   model 1 time/memory then model 2 time/memory.
-- `solver/{watercnn,giant,transformer,mlp_ov4}_phases`: four separate full-width
-  model figures with rotated phase labels
-  below individual bars and provider/configuration labels below each group.
-  No color-only legend is needed in this layout.
+- `solver/{watercnn,giant,transformer,mlp_ov4}_phases`: full-width model figures
+  with short configuration labels and a shared phase-color legend.
 
-The optional invocation produces 38 PNG/PDF pairs; the default produces 37.
+The optional invocation produces 41 PNG/PDF pairs; the default produces 40.
 This includes twelve individual solver panels under `solver/panels/`.
 
 ### Native Thesis Size
@@ -60,34 +56,53 @@ embedded (a)-(d) model/metric subcaptions; phase previews identify their model
 below the axis. Only the standalone exports under `solver/panels/` omit captions
 and panel letters. Those exports preserve the panel widths but omit the preview
 caption band, avoiding empty bottom space.
-The thesis source is not modified and no LaTeX integration is generated.
+The renderer does not modify the thesis source or generate LaTeX integration.
+Selected PGFs have been copied separately into the thesis's
+`graphics/cpu_inference/` directory for Chapters 6 and 7.
 All sixteen standalone solver/readiness panels also export caption-free `.pgf`
 files. PGF export requires pdflatex; the files use `pgf` and Latin Modern with
 T1 encoding. Combined previews keep subcaptions in PNG/PDF only. The PGF files
 contain neither model/subcaption headings nor panel letters; LaTeX will supply
-those at integration time.
+those at integration time. Cropped panel exports hide all nonselected axes;
+cropping alone does not clip off-panel drawing commands in raw PGF.
 
-Native solver panels use 5.5pt axis labels, 6pt y ticks, 5pt rotated x labels and
-4-4.5pt numerical labels. The plotting area is 40% shorter (0.738 inches), with
-the canvas shortened accordingly while preserving the label/caption space.
-Rotated x labels have a 3pt optical right shift and a 45-degree rotation;
-phase labels retain a gap above horizontal provider/configuration labels.
-Numerical bar labels remain vertical (90 degrees). Latency labels remain above
-their error-bar caps, with extra y-axis headroom as needed. Other value labels
-move inside their bar when they would extend above the plotting area, using
-contrast-dependent black/white text.
-SmartSim's model-execution phase is labeled `Run Model` in solver figures.
-Configuration labels spell out SmartSim and use TPQ/INTRA pairs. Phase figures
-use seconds per rank to reduce long tick labels at print size; the source and
-audit tables remain in milliseconds. Other figure layouts keep their own sizes.
+Native time/memory panels use 7.5pt axis labels, 8pt y ticks and 5.5pt numerical
+labels. Value annotations are centered with no horizontal offset. Repeated x
+labels use a shared single-row, six-configuration color legend. The plot area is 0.9 inches high, with only
+0.08 inches reserved below it. Phase panels use 10pt y ticks, 8.5pt axis
+and short horizontal configuration labels, and 7pt numerical labels (all +2pt
+from the previous version). Their plot area is 1.05 inches high.
+Their rotated per-bar labels are replaced by an eight-entry phase-color legend,
+distinguishing the inclusive AIx library call from ML-side forward and client calls.
+This legend uses two rows, with dotted rounded boxes around the three PhyDLL
+ML-side phases and the three SmartSim client phases. Shared Other stays outside
+the boxes. The thesis caption states the fixed per-configuration phase-bar order.
+Phase panels also include a two-line 6pt gray column-order note below the
+configuration labels, in a 0.56-inch bottom band.
+Phase-bar values use two decimal places consistently, with values rounding to
+zero displayed as `0.0`; this is display rounding only, not zero measured time.
+Readiness uses 9pt axes/y ticks, 8pt horizontal numerical labels, and a shared
+two-configuration color legend; the four-panel row has a 1.05-inch plot area.
+The two readiness bars are centered at 0 and 1 with width 0.8 and x limits
+[-0.8, 1.8], making their gap smaller than either outer margin.
+Standalone 150 mm legend PGFs are `solver/configuration_legend`,
+`solver/phase_legend`, and `readiness/configuration_legend` (also PNG/PDF).
+Captioned previews include legends; caption-free panels use the shared legend
+assets assembled by LaTeX. All shared legends sit above the graphs, with a
+roughly 3--5pt gap. Legends use 7.5pt text, or 8.5pt for readiness.
+Latency labels remain above their error-bar caps, with extra y-axis headroom as
+needed. Other value labels may move inside overflowing bars with contrasting text.
+Phase figures use seconds per rank; source/audit tables remain in milliseconds.
+Other figure layouts keep their own sizes.
 Plot titles contain only models and concise panel headings. Longer scope and
 statistical explanations live in the shared index, not in plot-level captions.
 The serif type, light horizontal grids, phase colors and grouped columns follow
-the terrain production phase reference. Readiness uses the prior paired-bar
-concept, with hatching distinguishing readiness rather than new colors.
+the terrain production phase reference. Readiness phase triptychs use hatching;
+the thesis latency panels distinguish configurations using color.
 Figures use reduced heights, `[TS]`/`[TBL]` model labels, `PhyDLL` in main
 comparisons and `default` versus `readiness` in readiness comparisons. AIx's
-single phase is labeled Forward and uses the same bar width as other phases;
+single phase is identified as an AIx library call in the native legend and uses
+the same bar width as other phases;
 its measured scope remains the inclusive AIx library call, not isolated compute.
 
 ## Scientific Constraints
@@ -162,7 +177,7 @@ semantics, full legend labels and rendered image dimensions. Numerical model
 parity remains outside this plotting task; no solver runs are launched.
 
 The figures use the two-warmup steady profiles (jobs 5007387-5007401).
-The revised layout suite contains 27 tests. Generated images and derived
+The revised layout suite contains 28 tests. Generated images and derived
 audit tables are ignored by Git under `figures/cpu_final/`; no legacy outputs
 were overwritten. Linear scaling can make very small bars hard to see when one
 provider dominates; numeric labels retain those measured values rather than
